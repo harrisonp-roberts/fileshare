@@ -1,6 +1,6 @@
 package dev.hroberts.fileshare.configuration;
 
-import dev.hroberts.fileshare.persistence.InMemoryFileInfoDatabase;
+import dev.hroberts.fileshare.persistence.database.InMemoryFileInfoDatabase;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

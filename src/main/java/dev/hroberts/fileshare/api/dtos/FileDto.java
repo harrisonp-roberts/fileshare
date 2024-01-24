@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.api.dto;
+package dev.hroberts.fileshare.api.dtos;
 
 public class FileDto {
     public String fileName;

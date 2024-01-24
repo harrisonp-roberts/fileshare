@@ -1,7 +1,11 @@
 package dev.hroberts.fileshare.persistence.repositories;
+
 import dev.hroberts.fileshare.application.domain.SharedFileInfo;
-import dev.hroberts.fileshare.persistence.InMemoryFileInfoDatabase;
+import dev.hroberts.fileshare.persistence.database.InMemoryFileInfoDatabase;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class FileInfoRepository {
@@ -13,5 +17,13 @@ public class FileInfoRepository {
 
     public SharedFileInfo saveFileInfo(SharedFileInfo fileInfo) {
         return database.saveFile(fileInfo);
+    }
+
+    public List<SharedFileInfo> listFileInfo() {
+        return database.listFiles();
+    }
+
+    public boolean deleteFileInfo(UUID fileId) {
+        return database.removeFile(fileId);
     }
 }
