@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.application;
+package dev.hroberts.fileshare.application.services;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.application.mappers.SharedFileInfoMapper;

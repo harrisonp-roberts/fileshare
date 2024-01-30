@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public class SharedFileInfo {
     public String filePath;
+    public String originalFile;
     public String fileName;
     public int downloadLimit;
     public int remainingDownloads;

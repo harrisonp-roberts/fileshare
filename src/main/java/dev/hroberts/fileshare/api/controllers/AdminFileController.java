@@ -1,7 +1,7 @@
 package dev.hroberts.fileshare.api.controllers;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
-import dev.hroberts.fileshare.application.FileAdminService;
+import dev.hroberts.fileshare.application.services.FileAdminService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -33,4 +33,5 @@ public class AdminFileController {
     public @ResponseBody List<SharedFileInfoDto> listAllFiles() {
         return fileAdminService.listAllFiles();
     }
+
 }

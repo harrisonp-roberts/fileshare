@@ -21,4 +21,9 @@ public class InMemoryFileInfoDatabase implements IDatabase {
     public boolean removeFile(UUID fileId) {
         return filePaths.removeIf(sharedFileInfo -> sharedFileInfo.fileId == fileId);
     }
+
+    public SharedFileInfo getById(UUID fileId) {
+        var optionalFile = filePaths.stream().filter(fileInfo -> fileInfo.fileId.equals(fileId)).findFirst();
+        return optionalFile.orElse(null);
+    }
 }

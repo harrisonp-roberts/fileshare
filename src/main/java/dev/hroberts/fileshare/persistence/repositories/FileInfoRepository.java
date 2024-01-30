@@ -19,6 +19,10 @@ public class FileInfoRepository {
         return database.saveFile(fileInfo);
     }
 
+    public SharedFileInfo getFileById(UUID fileId) {
+        return database.getById(fileId);
+    }
+
     public List<SharedFileInfo> listFileInfo() {
         return database.listFiles();
     }
