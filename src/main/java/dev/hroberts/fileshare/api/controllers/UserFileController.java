@@ -10,10 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,6 +27,12 @@ public class UserFileController {
 
     public UserFileController(UserFileService userFileService) {
         this.userFileService = userFileService;
+    }
+
+    @PostMapping("/upload")
+    public @ResponseBody ResponseEntity<String> uploadFile(@RequestParam("file")MultipartFile file) {
+        var fileId = userFileService.storeFile(file);
+        return ResponseEntity.ok(fileId.toString());
     }
 
     @GetMapping(value = "/download/{fileId}")

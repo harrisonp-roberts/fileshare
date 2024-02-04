@@ -1,11 +1,12 @@
 package dev.hroberts.fileshare.application.services;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
+import dev.hroberts.fileshare.api.dtos.UploadFileByPathDto;
 import dev.hroberts.fileshare.application.mappers.SharedFileInfoMapper;
-import dev.hroberts.fileshare.application.services.FileService;
 import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,24 +22,22 @@ public class FileAdminService {
      */
     final FileInfoRepository fileInfoRepository;
 
-    final FileService fileService;
+    final FileManipulationService fileManipulationService;
 
-    public FileAdminService(FileInfoRepository fileInfoRepository, FileService fileService) {
+    public FileAdminService(FileInfoRepository fileInfoRepository, FileManipulationService fileManipulationService) {
         this.fileInfoRepository = fileInfoRepository;
-        this.fileService = fileService;
+        this.fileManipulationService = fileManipulationService;
     }
 
-    public SharedFileInfoDto uploadFileByPath(SharedFileInfoDto sharedFileInfoDto) {
-        var newFileId = UUID.randomUUID();
-        var outputFilePath = "/home/hroberts/files/" + newFileId;
-        fileService.copyFile(sharedFileInfoDto.filePath, outputFilePath);
+    public SharedFileInfoDto uploadFileByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
+        var sharedFileInfo = SharedFileInfoMapper.MapUploadByPathDtoToDomain(uploadFileByPathDto);
+        var outputFilePath = "/home/hroberts/files/" + sharedFileInfo.fileId;
+
+        fileManipulationService.copyFile(uploadFileByPathDto.filePath, outputFilePath);
+        sharedFileInfo.filePath = outputFilePath;
 
         //todo validate the dto and stuff
         //todo also assign the file path in a less gross way
-        var sharedFileInfo = SharedFileInfoMapper.MapDtoToDomain(sharedFileInfoDto);
-        sharedFileInfo.filePath = outputFilePath;
-        sharedFileInfo.fileId = newFileId;
-        sharedFileInfo.remainingDownloads = sharedFileInfo.downloadLimit;
 
         var responseSharedFileInfo = fileInfoRepository.saveFileInfo(sharedFileInfo);
         return SharedFileInfoMapper.MapDomainToDto(responseSharedFileInfo);
@@ -52,7 +51,7 @@ public class FileAdminService {
     public void purgeFiles() {
         var files = fileInfoRepository.listFileInfo();
         files.forEach(sharedFileInfo -> {
-            fileService.deleteFile(sharedFileInfo.filePath);
+            fileManipulationService.deleteFile(sharedFileInfo.filePath);
             fileInfoRepository.deleteFileInfo(sharedFileInfo.fileId);
         });
     }
