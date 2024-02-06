@@ -1,5 +1,6 @@
 package dev.hroberts.fileshare.api.controllers;
 
+import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.application.services.UserFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -30,9 +31,9 @@ public class UserFileController {
     }
 
     @PostMapping("/upload")
-    public @ResponseBody ResponseEntity<String> uploadFile(@RequestParam("file")MultipartFile file) {
-        var fileId = userFileService.storeFile(file);
-        return ResponseEntity.ok(fileId.toString());
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file")MultipartFile file, @RequestParam int maxUploads) {
+        var sharedFileInfoDto = userFileService.storeFile(file, maxUploads);
+        return ResponseEntity.ok(sharedFileInfoDto);
     }
 
     @GetMapping(value = "/download/{fileId}")
