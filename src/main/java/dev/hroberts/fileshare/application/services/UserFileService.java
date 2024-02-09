@@ -23,21 +23,24 @@ public class UserFileService {
         this.localFileStore = localFileStore;
     }
 
-    //todo create an IUserFileService that returns a Resource maybe?
     public PathResource downloadFileById(UUID fileId) throws IOException {
         var fileInfo = fileInfoRepository.getFileById(fileId);
         var cachedFile = localFileStore.cacheFile(fileId.toString(), fileInfo.fileName);
-        ;
         return new PathResource(cachedFile);
     }
 
-    //todo refactor all references maxUploads/downloadLimits to have same name
-    public SharedFileInfoDto storeFile(MultipartFile file, int maxUploads) throws IOException {
+    public SharedFileInfoDto storeFile(MultipartFile file, int downloadLimit) {
         var fileId = UUID.randomUUID();
         var fileInfo = new SharedFileInfo();
-        localFileStore.storeFile(file.getInputStream(), fileId.toString());
+
+        try {
+            localFileStore.storeFile(file.getInputStream(), fileId.toString());
+        } catch (IOException e) {
+            throw new RuntimeException("Could not upload file");
+        }
+
         fileInfo.fileName = file.getOriginalFilename();
-        fileInfo.downloadLimit = maxUploads;
+        fileInfo.downloadLimit = downloadLimit;
         fileInfo.fileId = fileId;
         fileInfoRepository.saveFileInfo(fileInfo);
         return SharedFileInfoMapper.MapDomainToDto(fileInfo);

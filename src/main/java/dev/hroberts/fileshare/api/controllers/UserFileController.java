@@ -5,6 +5,7 @@ import dev.hroberts.fileshare.application.services.UserFileService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +18,19 @@ import java.util.UUID;
 @Controller
 @RequestMapping("files")
 public class UserFileController {
-
     private final UserFileService userFileService;
-
     public UserFileController(UserFileService userFileService) {
         this.userFileService = userFileService;
     }
 
     @PostMapping("/upload")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int maxUploads) throws IOException {
-        //todo remove exception from method signature, handle this exception in the fileservice and have it throw something else.
-        var sharedFileInfoDto = userFileService.storeFile(file, maxUploads);
-        return ResponseEntity.ok(sharedFileInfoDto);
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int downloadLimit) throws IOException {
+        try {
+            var sharedFileInfoDto = userFileService.storeFile(file, downloadLimit);
+            return ResponseEntity.ok(sharedFileInfoDto);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping(value = "/download/{fileId}")
@@ -38,7 +40,8 @@ public class UserFileController {
             var response = userFileService.downloadFileById(fileId);
             var contentLength = response.contentLength();
             var headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            var mediaType = MediaTypeFactory.getMediaType(response).orElse(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentType(mediaType);
             headers.add("Content-Disposition", "attachment; filename=" + response.getFilename());
 
             return ResponseEntity.ok()

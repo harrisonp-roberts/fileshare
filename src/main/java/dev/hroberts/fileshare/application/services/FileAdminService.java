@@ -12,16 +12,7 @@ import java.util.List;
 
 @Service
 public class FileAdminService {
-    /* TODO:
-     * - Will have connections to two file systems. One for intaking/(staging?), the other for persisting. This will prevent someone
-     * from uploading a file, then changing it in place. Once it's uploaded, that version should stay the same no matter what happens to the original
-     *
-     * - First, read file from file system
-     * - Then, save that file to the persistence file system
-     * - Then, save the file info
-     */
     final FileInfoRepository fileInfoRepository;
-
     final LocalFileStore fileStore;
 
     //todo inject the interface instead
