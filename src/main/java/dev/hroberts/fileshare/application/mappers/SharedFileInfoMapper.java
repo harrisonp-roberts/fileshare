@@ -24,7 +24,6 @@ public class SharedFileInfoMapper {
         var sharedFileInfo = new SharedFileInfo();
         sharedFileInfo.fileId = UUID.randomUUID();
         sharedFileInfo.fileName = fileName;
-        sharedFileInfo.filePath = uploadFileByPathDto.filePath;
         sharedFileInfo.downloadLimit = 10;
         return sharedFileInfo;
     }

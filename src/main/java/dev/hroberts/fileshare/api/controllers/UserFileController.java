@@ -2,10 +2,6 @@ package dev.hroberts.fileshare.api.controllers;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.application.services.UserFileService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,10 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.UUID;
 
 @Controller
@@ -31,7 +25,8 @@ public class UserFileController {
     }
 
     @PostMapping("/upload")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file")MultipartFile file, @RequestParam int maxUploads) {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int maxUploads) throws IOException {
+        //todo remove exception from method signature, handle this exception in the fileservice and have it throw something else.
         var sharedFileInfoDto = userFileService.storeFile(file, maxUploads);
         return ResponseEntity.ok(sharedFileInfoDto);
     }
