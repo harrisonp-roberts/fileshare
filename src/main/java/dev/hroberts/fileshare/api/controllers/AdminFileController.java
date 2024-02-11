@@ -2,7 +2,7 @@ package dev.hroberts.fileshare.api.controllers;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.dtos.UploadFileByPathDto;
-import dev.hroberts.fileshare.application.services.FileAdminService;
+import dev.hroberts.fileshare.application.services.AdminFileService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,10 +14,10 @@ import java.util.List;
 @Controller
 @RequestMapping("admin")
 public class AdminFileController {
-    private final FileAdminService fileAdminService;
+    private final AdminFileService fileAdminService;
 
-    public AdminFileController(FileAdminService fileAdminService) {
-        this.fileAdminService = fileAdminService;
+    public AdminFileController(AdminFileService adminFileService) {
+        this.fileAdminService = adminFileService;
     }
 
     @PostMapping(value = "/uploadByPath", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -3,7 +3,7 @@ package dev.hroberts.fileshare.application.services;
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.dtos.UploadFileByPathDto;
 import dev.hroberts.fileshare.application.mappers.SharedFileInfoMapper;
-import dev.hroberts.fileshare.persistence.filestore.LocalFileStore;
+import dev.hroberts.fileshare.persistence.filestore.IFileStore;
 import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +11,12 @@ import java.io.IOException;
 import java.util.List;
 
 @Service
-public class FileAdminService {
+public class AdminFileService {
     final FileInfoRepository fileInfoRepository;
-    final LocalFileStore fileStore;
+    final IFileStore fileStore;
 
     //todo inject the interface instead
-    public FileAdminService(FileInfoRepository fileInfoRepository, LocalFileStore fileStore) {
+    public AdminFileService(FileInfoRepository fileInfoRepository, IFileStore fileStore) {
         this.fileInfoRepository = fileInfoRepository;
         this.fileStore = fileStore;
     }
