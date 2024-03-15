@@ -20,6 +20,7 @@ public class AdminFileController {
         this.fileAdminService = adminFileService;
     }
 
+    @Deprecated
     @PostMapping(value = "/uploadByPath", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFileByPath(@RequestBody UploadFileByPathDto uploadFileByPathDto) {
         try {

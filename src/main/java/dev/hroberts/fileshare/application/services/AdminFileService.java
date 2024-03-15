@@ -21,6 +21,7 @@ public class AdminFileService {
         this.fileStore = fileStore;
     }
 
+    @Deprecated
     public SharedFileInfoDto uploadFileByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
         var sharedFileInfo = SharedFileInfoMapper.MapUploadByPathDtoToDomain(uploadFileByPathDto);
 
@@ -38,7 +39,7 @@ public class AdminFileService {
     public void purgeFiles() {
         var files = fileInfoRepository.listFileInfo();
         files.forEach(sharedFileInfo -> {
-            fileStore.deleteFileByName(sharedFileInfo.fileId.toString());
+            fileStore.deleteFileByName(sharedFileInfo.fileId);
             fileInfoRepository.deleteFileInfo(sharedFileInfo.fileId);
         });
     }

@@ -19,7 +19,7 @@ public class FileInfoRepository {
         return database.saveFile(fileInfo);
     }
 
-    public SharedFileInfo getFileById(UUID fileId) {
+    public SharedFileInfo getFileById(String fileId) {
         return database.getById(fileId);
     }
 
@@ -27,7 +27,7 @@ public class FileInfoRepository {
         return database.listFiles();
     }
 
-    public boolean deleteFileInfo(UUID fileId) {
+    public boolean deleteFileInfo(String fileId) {
         return database.removeFile(fileId);
     }
 }

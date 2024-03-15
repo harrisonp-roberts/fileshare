@@ -20,41 +20,33 @@ public class UserFileService {
     final FileInfoRepository fileInfoRepository;
     final IFileStore localFileStore;
 
-    public UserFileService(FileInfoRepository fileInfoRepository,
-                           IFileStore localFileStore, @Value("${host}") String host) {
+    public UserFileService(FileInfoRepository fileInfoRepository, IFileStore localFileStore,
+                           @Value("${host}") String host) {
         this.fileInfoRepository = fileInfoRepository;
         this.localFileStore = localFileStore;
         this.host = host;
     }
-
-    public PathResource downloadFile(String )
-
-    public PathResource downloadFileById(UUID fileId) throws IOException {
+    
+    public PathResource downloadFileById(String fileId) throws IOException {
+        //todo would like to get rid of the whole cache thing.
         var fileInfo = fileInfoRepository.getFileById(fileId);
-        var cachedFile = localFileStore.cacheFile(fileId.toString(), fileInfo.fileName);
+        var cachedFile = localFileStore.cacheFile(fileId, fileInfo.fileName);
         return new PathResource(cachedFile);
     }
 
     public SharedFileInfoDto storeFile(MultipartFile file, int downloadLimit) {
-        var fileId = UUID.randomUUID();
+        var fileId = RandomStringUtils.randomAlphabetic(8);
         var fileInfo = new SharedFileInfo();
 
         try {
-            localFileStore.storeFile(file.getInputStream(), fileId.toString());
+            localFileStore.storeFile(file.getInputStream(), fileId);
         } catch (IOException e) {
             throw new RuntimeException("Could not upload file");
         }
 
         fileInfo.fileName = file.getOriginalFilename();
         fileInfo.downloadLimit = downloadLimit;
-        fileInfo.fileId = fileId;
-        fileInfo.downloadUrl = generateDownloadUrl();
         fileInfoRepository.saveFileInfo(fileInfo);
         return SharedFileInfoMapper.MapDomainToDto(fileInfo);
-    }
-
-    private String generateDownloadUrl() {
-        var shortId = RandomStringUtils.randomAlphabetic(8);
-        return host + "/download/" + shortId;
     }
 }

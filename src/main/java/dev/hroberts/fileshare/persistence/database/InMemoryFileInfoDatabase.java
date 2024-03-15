@@ -18,11 +18,11 @@ public class InMemoryFileInfoDatabase implements IDatabase {
         return List.copyOf(filePaths);
     }
 
-    public boolean removeFile(UUID fileId) {
-        return filePaths.removeIf(sharedFileInfo -> sharedFileInfo.fileId == fileId);
+    public boolean removeFile(String fileId) {
+        return filePaths.removeIf(sharedFileInfo -> sharedFileInfo.fileId.equals(fileId));
     }
 
-    public SharedFileInfo getById(UUID fileId) {
+    public SharedFileInfo getById(String fileId) {
         var optionalFile = filePaths.stream().filter(fileInfo -> fileInfo.fileId.equals(fileId)).findFirst();
         return optionalFile.orElse(null);
     }

@@ -34,7 +34,7 @@ public class UserFileController {
     }
 
     @GetMapping(value = "/download/{fileId}")
-    public @ResponseBody ResponseEntity<Resource> getFile(@PathVariable UUID fileId) throws FileNotFoundException {
+    public @ResponseBody ResponseEntity<Resource> getFile(@PathVariable String fileId) throws FileNotFoundException {
 
         try {
             var response = userFileService.downloadFileById(fileId);
