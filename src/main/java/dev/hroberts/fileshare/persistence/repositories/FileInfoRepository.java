@@ -1,33 +1,38 @@
 package dev.hroberts.fileshare.persistence.repositories;
 
 import dev.hroberts.fileshare.application.domain.SharedFileInfo;
-import dev.hroberts.fileshare.persistence.database.InMemoryFileInfoDatabase;
-import org.springframework.stereotype.Repository;
+import dev.hroberts.fileshare.persistence.database.FileInfoDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-@Repository
+@Component
 public class FileInfoRepository {
-    final InMemoryFileInfoDatabase database;
+    private final FileInfoDatabase database;
 
-    public FileInfoRepository(InMemoryFileInfoDatabase database) {
+    @Autowired
+    public FileInfoRepository(FileInfoDatabase database){
         this.database = database;
     }
 
     public SharedFileInfo saveFileInfo(SharedFileInfo fileInfo) {
-        return database.saveFile(fileInfo);
+        return database.save(fileInfo);
     }
 
     public SharedFileInfo getFileById(String fileId) {
-        return database.getById(fileId);
+        return database.findById(fileId).orElseThrow();
     }
 
     public List<SharedFileInfo> listFileInfo() {
-        return database.listFiles();
+        var iterator = database.findAll();
+        var list = new ArrayList<SharedFileInfo>();
+        iterator.forEach(list::add);
+        return list;
     }
 
-    public boolean deleteFileInfo(String fileId) {
-        return database.removeFile(fileId);
+    public void deleteFileInfo(String fileId) {
+        database.deleteById(fileId);
     }
 }

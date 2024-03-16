@@ -16,8 +16,8 @@ public class AdminFileService {
     final IFileStore fileStore;
 
     //todo inject the interface instead
-    public AdminFileService(FileInfoRepository fileInfoRepository, IFileStore fileStore) {
-        this.fileInfoRepository = fileInfoRepository;
+    public AdminFileService(FileInfoRepository repository, IFileStore fileStore) {
+        this.fileInfoRepository = repository;
         this.fileStore = fileStore;
     }
 
