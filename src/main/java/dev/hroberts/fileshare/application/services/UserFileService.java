@@ -44,6 +44,7 @@ public class UserFileService {
             throw new RuntimeException("Could not upload file");
         }
 
+        fileInfo.fileId = fileId;
         fileInfo.fileName = file.getOriginalFilename();
         fileInfo.downloadLimit = downloadLimit;
         fileInfoRepository.saveFileInfo(fileInfo);

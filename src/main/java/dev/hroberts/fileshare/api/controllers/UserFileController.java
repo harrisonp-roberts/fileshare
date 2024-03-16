@@ -11,20 +11,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("files")
 public class UserFileController {
     private final UserFileService userFileService;
+
     public UserFileController(UserFileService userFileService) {
         this.userFileService = userFileService;
     }
 
     @PostMapping("/upload")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int downloadLimit) throws IOException {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int downloadLimit) {
         try {
             var sharedFileInfoDto = userFileService.storeFile(file, downloadLimit);
             return ResponseEntity.ok(sharedFileInfoDto);
@@ -34,7 +33,7 @@ public class UserFileController {
     }
 
     @GetMapping(value = "/download/{fileId}")
-    public @ResponseBody ResponseEntity<Resource> getFile(@PathVariable String fileId) throws FileNotFoundException {
+    public @ResponseBody ResponseEntity<Resource> getFile(@PathVariable String fileId) {
 
         try {
             var response = userFileService.downloadFileById(fileId);
@@ -44,11 +43,7 @@ public class UserFileController {
             headers.setContentType(mediaType);
             headers.add("Content-Disposition", "attachment; filename=" + response.getFilename());
 
-            return ResponseEntity.ok()
-                    .contentLength(contentLength)
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .headers(headers)
-                    .body(response);
+            return ResponseEntity.ok().contentLength(contentLength).contentType(MediaType.APPLICATION_OCTET_STREAM).headers(headers).body(response);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }

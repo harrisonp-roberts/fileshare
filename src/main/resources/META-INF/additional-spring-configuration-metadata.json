@@ -1,0 +1,18 @@
+{
+  "properties": [
+    {
+      "name": "redis.server",
+      "type": "java.lang.String",
+      "description": "Description for redis.server."
+    },
+    {
+      "name": "redis.port",
+      "type": "java.lang.Integer",
+      "description": "Description for redis.port."
+    },
+    {
+      "name": "redis.password",
+      "type": "java.lang.String",
+      "description": "Description for redis.password."
+    }
+  ] }
