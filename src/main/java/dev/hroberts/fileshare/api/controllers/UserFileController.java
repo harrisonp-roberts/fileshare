@@ -24,12 +24,12 @@ public class UserFileController {
 
     @PostMapping("/upload")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int downloadLimit) {
-        try {
+//        try {
             var sharedFileInfoDto = userFileService.storeFile(file, downloadLimit);
             return ResponseEntity.ok(sharedFileInfoDto);
-        } catch (RuntimeException ex) {
-            return ResponseEntity.internalServerError().build();
-        }
+//        } catch (RuntimeException ex) {
+//            return ResponseEntity.internalServerError().build();
+//        }
     }
 
     @GetMapping(value = "/download/{fileId}")

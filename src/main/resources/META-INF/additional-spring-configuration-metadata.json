@@ -7,7 +7,7 @@
     },
     {
       "name": "redis.port",
-      "type": "java.lang.Integer",
+      "type": "java.lang.String",
       "description": "Description for redis.port."
     },
     {

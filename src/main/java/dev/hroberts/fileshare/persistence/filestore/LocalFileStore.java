@@ -26,7 +26,7 @@ public class LocalFileStore implements IFileStore {
                     .toAbsolutePath();
             Files.copy(input, destinationFile, StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception ex) {
-            throw new RuntimeException("Error reading file");
+            throw new RuntimeException(ex.getMessage());
         }
     }
 

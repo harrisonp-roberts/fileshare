@@ -7,6 +7,15 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 
 @SpringBootApplication
 public class FileshareApplication {
+    //todo make sure I'm not mapping to the dto in the services on the application level
+    /*
+    TODO:
+    - clean up repository/database implementation bs
+    - build versioning
+    - watch directory functionality
+    - compression
+    - actual multipart files lol
+     */
     public static void main(String[] args) {
         SpringApplication.run(FileshareApplication.class, args);
     }
