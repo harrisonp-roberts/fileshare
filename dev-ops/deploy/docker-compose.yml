@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  fileshare:
+    image: fileshare
+    restart: unless-stopped
+    environment:
+      - HOST=localhost
+      - REDIS_SERVER=fileshare-redis
+    ports:
+      - '8888:8080'
+    networks:
+      - fileshare
+    volumes:
+      - /files/dir:/files #Optional
+      - /cache/dir:/tmp/cache #Optional
+
+  fileshare-redis:
+    image: redis:6.2-alpine
+    container_name: fileshare-redis
+    restart: unless-stopped
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - fileshare-data:/data
+    networks:
+      - fileshare
+
+volumes:
+  fileshare-data:
+    driver: local
+
+networks:
+  fileshare:
+    name: fileshare
+    driver: bridge

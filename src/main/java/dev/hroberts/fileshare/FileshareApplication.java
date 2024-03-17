@@ -11,7 +11,6 @@ public class FileshareApplication {
     /*
     TODO:
     - clean up repository/database implementation bs
-    - build versioning
     - watch directory functionality
     - compression
     - actual multipart files lol
