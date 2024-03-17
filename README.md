@@ -19,7 +19,7 @@
   4. Run the application
 
 ## Running Production:
-- Run the script in dev-ops/build to build a docker image containing the project jar
+- Run the script in dev-ops to build a docker image containing the project jar
 - In the dev-ops/build directory, configure the docker-compose file
 - Run the docker compose file. This will spin up the fileshare application and a redis instance. They will be connected on a bridge network and the fileshare application will be exposed on port 8888 by default
 

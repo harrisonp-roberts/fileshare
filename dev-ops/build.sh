@@ -1,4 +1,4 @@
 #! /bin/bash
-cd ../../
+cd ../
 mvn clean install
 docker build -t fileshare .
