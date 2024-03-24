@@ -35,19 +35,16 @@ public class UserFileService {
     }
 
     public SharedFileInfoDto storeFile(MultipartFile file, int downloadLimit) {
-        var fileId = RandomStringUtils.randomAlphabetic(8);
-        var fileInfo = new SharedFileInfo();
+        var fileInfo = new SharedFileInfo(file.getOriginalFilename(), downloadLimit);
+        fileInfoRepository.saveFileInfo(fileInfo);
 
         try {
-            localFileStore.storeFile(file.getInputStream(), fileId);
+            localFileStore.storeFile(file.getInputStream(), fileInfo.fileId);
         } catch (IOException e) {
+            fileInfoRepository.deleteFileInfo(fileInfo.fileId);
             throw new RuntimeException("Could not upload file");
         }
 
-        fileInfo.fileId = fileId;
-        fileInfo.fileName = file.getOriginalFilename();
-        fileInfo.downloadLimit = downloadLimit;
-        fileInfoRepository.saveFileInfo(fileInfo);
         return SharedFileInfoMapper.MapDomainToDto(fileInfo);
     }
 }
