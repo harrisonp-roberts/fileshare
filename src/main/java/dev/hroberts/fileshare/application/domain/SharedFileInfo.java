@@ -18,7 +18,12 @@ public class SharedFileInfo {
     public SharedFileInfo(String fileName, int downloadLimit) {
         fileId = RandomStringUtils.randomAlphabetic(8);
         this.fileName = fileName;
-        this.downloadLimit = downloadLimit;
+        this.downloadLimit =    downloadLimit;
         remainingDownloads = downloadLimit;
+    }
+
+
+    public void download() {
+        remainingDownloads--;
     }
 }

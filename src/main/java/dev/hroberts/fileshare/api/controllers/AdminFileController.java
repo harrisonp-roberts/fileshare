@@ -2,6 +2,7 @@ package dev.hroberts.fileshare.api.controllers;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.dtos.UploadFileByPathDto;
+import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.services.AdminFileService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,8 @@ public class AdminFileController {
     @PostMapping(value = "/uploadByPath", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFileByPath(@RequestBody UploadFileByPathDto uploadFileByPathDto) {
         try {
-            var response = fileAdminService.uploadFileByPath(uploadFileByPathDto);
+            var fileInfo = fileAdminService.uploadByPath(uploadFileByPathDto);
+            var response = SharedFileInfoMapper.MapDomainToDto(fileInfo);
             return ResponseEntity.ok(response);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
@@ -39,8 +41,11 @@ public class AdminFileController {
 
     @GetMapping(value = "/listAllFiles", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ResponseEntity<List<SharedFileInfoDto>> listAllFiles() {
-        var sharedFileInfoDtos = fileAdminService.listAllFiles();
-        return ResponseEntity.ok(sharedFileInfoDtos);
+        var sharedFileInfoList = fileAdminService.listFiles();
+        var response = sharedFileInfoList.stream()
+                .map(SharedFileInfoMapper::MapDomainToDto)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 
 }

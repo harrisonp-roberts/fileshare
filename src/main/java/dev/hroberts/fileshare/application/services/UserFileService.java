@@ -1,18 +1,19 @@
 package dev.hroberts.fileshare.application.services;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
+import dev.hroberts.fileshare.application.domain.DownloadableFile;
 import dev.hroberts.fileshare.application.domain.SharedFileInfo;
-import dev.hroberts.fileshare.application.mappers.SharedFileInfoMapper;
+import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
+import dev.hroberts.fileshare.application.repositories.FileInfoRepository;
 import dev.hroberts.fileshare.persistence.filestore.IFileStore;
-import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.PathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.UUID;
+import java.nio.file.Path;
 
 @Service
 public class UserFileService {
@@ -27,24 +28,26 @@ public class UserFileService {
         this.host = host;
     }
     
-    public PathResource downloadFileById(String fileId) throws IOException {
-        //todo would like to get rid of the whole cache thing.
-        var fileInfo = fileInfoRepository.getFileById(fileId);
-        var cachedFile = localFileStore.cacheFile(fileId, fileInfo.fileName);
-        return new PathResource(cachedFile);
+    public DownloadableFile downloadFile(String fileId) throws FileNotFoundException {
+        var fileInfo = fileInfoRepository.findById(fileId).orElseThrow();
+        fileInfo.download();
+        var filePath = localFileStore.load(fileInfo.fileId);
+        var fileName = fileInfo.fileName;
+        fileInfoRepository.save(fileInfo);
+        return new DownloadableFile(fileName, filePath);
     }
 
-    public SharedFileInfoDto storeFile(MultipartFile file, int downloadLimit) {
+    public SharedFileInfo uploadFile(MultipartFile file, int downloadLimit) {
         var fileInfo = new SharedFileInfo(file.getOriginalFilename(), downloadLimit);
-        fileInfoRepository.saveFileInfo(fileInfo);
+        fileInfoRepository.save(fileInfo);
 
         try {
-            localFileStore.storeFile(file.getInputStream(), fileInfo.fileId);
+            localFileStore.save(file.getInputStream(), fileInfo.fileId);
         } catch (IOException e) {
-            fileInfoRepository.deleteFileInfo(fileInfo.fileId);
+            fileInfoRepository.delete(fileInfo);
             throw new RuntimeException("Could not upload file");
         }
 
-        return SharedFileInfoMapper.MapDomainToDto(fileInfo);
+        return fileInfo;
     }
 }

@@ -12,7 +12,6 @@ services:
       - fileshare
     volumes:
       - /files/dir:/files #Optional
-      - /cache/dir:/tmp/cache #Optional
 
   fileshare-redis:
     image: redis:6.2-alpine

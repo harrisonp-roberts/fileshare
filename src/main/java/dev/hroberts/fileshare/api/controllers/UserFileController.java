@@ -1,7 +1,9 @@
 package dev.hroberts.fileshare.api.controllers;
 
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
+import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.services.UserFileService;
+import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,30 +26,24 @@ public class UserFileController {
 
     @PostMapping("/upload")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam int downloadLimit) {
-//        try {
-            var sharedFileInfoDto = userFileService.storeFile(file, downloadLimit);
-            return ResponseEntity.ok(sharedFileInfoDto);
-//        } catch (RuntimeException ex) {
-//            return ResponseEntity.internalServerError().build();
-//        }
+        var sharedFileInfo = userFileService.uploadFile(file, downloadLimit);
+        return ResponseEntity.ok(SharedFileInfoMapper.MapDomainToDto(sharedFileInfo));
     }
 
     @GetMapping(value = "/download/{fileId}")
     public @ResponseBody ResponseEntity<Resource> getFile(@PathVariable String fileId) {
-
         try {
-            var response = userFileService.downloadFileById(fileId);
+            var downloadableFile = userFileService.downloadFile(fileId);
+            var response = new PathResource(downloadableFile.filePath);
             var contentLength = response.contentLength();
             var headers = new HttpHeaders();
             var mediaType = MediaTypeFactory.getMediaType(response).orElse(MediaType.APPLICATION_OCTET_STREAM);
             headers.setContentType(mediaType);
-            headers.add("Content-Disposition", "attachment; filename=" + response.getFilename());
+            headers.add("Content-Disposition", "attachment; filename=" + downloadableFile.fileName);
 
             return ResponseEntity.ok().contentLength(contentLength).contentType(MediaType.APPLICATION_OCTET_STREAM).headers(headers).body(response);
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.notFound().build();
         }
-
     }
-
 }

@@ -1,46 +1,52 @@
 package dev.hroberts.fileshare.application.services;
 
-import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.dtos.UploadFileByPathDto;
-import dev.hroberts.fileshare.application.mappers.SharedFileInfoMapper;
+import dev.hroberts.fileshare.application.domain.SharedFileInfo;
+import dev.hroberts.fileshare.application.repositories.FileInfoRepository;
 import dev.hroberts.fileshare.persistence.filestore.IFileStore;
-import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class AdminFileService {
     final FileInfoRepository fileInfoRepository;
     final IFileStore fileStore;
 
-    //todo inject the interface instead
     public AdminFileService(FileInfoRepository repository, IFileStore fileStore) {
         this.fileInfoRepository = repository;
         this.fileStore = fileStore;
     }
 
     @Deprecated
-    public SharedFileInfoDto uploadFileByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
-        var sharedFileInfo = SharedFileInfoMapper.MapUploadByPathDtoToDomain(uploadFileByPathDto);
+    public SharedFileInfo uploadByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
+        var fileName = extractFileName(uploadFileByPathDto.filePath);
+        var sharedFileInfo = new SharedFileInfo(fileName, uploadFileByPathDto.downloadLimit);
 
-        fileStore.copyFileIn(uploadFileByPathDto.filePath, sharedFileInfo.fileId.toString());
-        var responseSharedFileInfo = fileInfoRepository.saveFileInfo(sharedFileInfo);
-
-        return SharedFileInfoMapper.MapDomainToDto(responseSharedFileInfo);
+        fileStore.copyFileIn(uploadFileByPathDto.filePath, sharedFileInfo.fileId);
+        return fileInfoRepository.save(sharedFileInfo);
     }
 
-    public List<SharedFileInfoDto> listAllFiles() {
-        var fileInfoList = fileInfoRepository.listFileInfo();
-        return fileInfoList.stream().map(SharedFileInfoMapper::MapDomainToDto).toList();
+    public List<SharedFileInfo> listFiles() {
+        var fileInfoIterable = fileInfoRepository.findAll();
+        return StreamSupport.stream(fileInfoIterable.spliterator(), false).collect(Collectors.toList());
     }
 
     public void purgeFiles() {
-        var files = fileInfoRepository.listFileInfo();
+        var files = fileInfoRepository.findAll();
         files.forEach(sharedFileInfo -> {
             fileStore.deleteFileByName(sharedFileInfo.fileId);
-            fileInfoRepository.deleteFileInfo(sharedFileInfo.fileId);
+            fileInfoRepository.delete(sharedFileInfo);
         });
+    }
+
+    private String extractFileName(String filePath) {
+        var fileUri = URI.create(filePath);
+        var path = fileUri.getPath();
+        return path.substring(filePath.lastIndexOf('/') + 1);
     }
 }
