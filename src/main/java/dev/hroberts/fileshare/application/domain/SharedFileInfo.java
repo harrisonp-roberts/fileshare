@@ -13,6 +13,7 @@ public class SharedFileInfo {
     public int remainingDownloads;
 
     public SharedFileInfo() {
+        fileId = RandomStringUtils.randomAlphabetic(8);
     }
 
     public SharedFileInfo(String fileName, int downloadLimit) {

@@ -6,6 +6,8 @@ import dev.hroberts.fileshare.application.domain.SharedFileInfo;
 import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.repositories.FileInfoRepository;
 import dev.hroberts.fileshare.persistence.filestore.IFileStore;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileItemInputIterator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.PathResource;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 public class UserFileService {
@@ -37,17 +43,34 @@ public class UserFileService {
         return new DownloadableFile(fileName, filePath);
     }
 
-    public SharedFileInfo uploadFile(MultipartFile file, int downloadLimit) {
-        var fileInfo = new SharedFileInfo(file.getOriginalFilename(), downloadLimit);
-        fileInfoRepository.save(fileInfo);
+    public SharedFileInfo uploadFile(FileItemInputIterator fileInputIterator) {
+        var fields = new HashMap<String, String>();
+        var fileInfo = new SharedFileInfo();
+        //todo this needs a mapper or something cause this approach ain't it
 
         try {
-            localFileStore.save(file.getInputStream(), fileInfo.fileId);
-        } catch (IOException e) {
-            fileInfoRepository.delete(fileInfo);
-            throw new RuntimeException("Could not upload file");
-        }
+            fileInputIterator.forEachRemaining(item -> {
+                InputStream stream = item.getInputStream();
+                if (item.isFormField()) {
+                    fields.put(item.getFieldName(), Arrays.toString(stream.readAllBytes()));
+                } else {
+                    fields.put("fileName", item.getName());
+                    localFileStore.save(stream, fileInfo.fileId);
+                }
+            });
 
-        return fileInfo;
+            parseFormFields(fields, fileInfo);
+            fileInfoRepository.save(fileInfo);
+            return fileInfo;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void parseFormFields(HashMap<String, String> fields, SharedFileInfo fileInfo) {
+        //todo bad
+        var fileName = Optional.ofNullable(fields.get("fileName")).orElseThrow(() -> new RuntimeException("Filename is required"));
+        fileInfo.downloadLimit = 1;
+        fileInfo.fileName = fileName;
     }
 }

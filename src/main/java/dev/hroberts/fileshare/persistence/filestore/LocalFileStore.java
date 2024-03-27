@@ -23,7 +23,12 @@ public class LocalFileStore implements IFileStore {
             var destinationFile = rootFilePath.resolve(Paths.get(fileName))
                     .normalize()
                     .toAbsolutePath();
-            Files.copy(input, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+
+            if (!destinationFile.toFile().exists()) {
+                destinationFile.toFile().createNewFile();
+            }
+
+            Files.write(destinationFile, input.readAllBytes(), StandardOpenOption.APPEND);
         } catch (Exception ex) {
             throw new RuntimeException(ex.getMessage());
         }

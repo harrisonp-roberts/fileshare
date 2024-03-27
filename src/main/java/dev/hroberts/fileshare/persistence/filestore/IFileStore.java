@@ -8,7 +8,6 @@ import java.nio.file.Path;
 
 public interface IFileStore {
     void save(InputStream input, String fileName);
-
     void deleteFileByName(String fileName);
 
     void copyFileIn(String inputFilePath, String fileName) throws FileAlreadyExistsException, IOException;
