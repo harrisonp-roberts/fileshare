@@ -20,7 +20,8 @@ public class LocalFileStore implements IFileStore {
     @Override
     public void save(InputStream input, String fileName) {
         try {
-            var destinationFile = rootFilePath.resolve(Paths.get(fileName))
+            var destinationFile = rootFilePath
+                    .resolve(Paths.get(fileName))
                     .normalize()
                     .toAbsolutePath();
 

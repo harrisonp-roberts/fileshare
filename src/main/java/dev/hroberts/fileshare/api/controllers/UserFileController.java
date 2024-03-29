@@ -4,11 +4,7 @@ import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.services.UserFileService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.fileupload2.core.DiskFileItemFactory;
-import org.apache.commons.fileupload2.core.FileItemHeaders;
-import org.apache.commons.fileupload2.jakarta.JakartaServletDiskFileUpload;
 import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
-import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -17,11 +13,8 @@ import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.util.Iterator;
-import java.util.List;
+import java.io.IOException;
 
 @Controller
 @RequestMapping("files")
@@ -43,7 +36,6 @@ public class UserFileController {
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
-
     }
 
     @GetMapping(value = "/download/{fileId}")
