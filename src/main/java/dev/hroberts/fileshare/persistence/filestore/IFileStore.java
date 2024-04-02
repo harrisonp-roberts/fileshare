@@ -5,12 +5,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
+import java.util.UUID;
 
 public interface IFileStore {
-    void save(InputStream input, String fileName);
-    void deleteFileByName(String fileName);
+    long write(UUID uploadId, String name, InputStream input);
 
-    void copyFileIn(String inputFilePath, String fileName) throws FileAlreadyExistsException, IOException;
+    void deleteFileByName(UUID uploadId, String fileName);
 
-    Path load(String fileName) throws FileNotFoundException;
+    void copyFileIn(UUID uploadId, String inputFilePath, String fileName) throws FileAlreadyExistsException, IOException;
+
+    void copy(UUID uploadId, String source, String target, boolean append) throws IOException;
+
+    Path load(UUID uploadId, String fileName) throws FileNotFoundException;
 }

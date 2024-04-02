@@ -1,65 +1,86 @@
 package dev.hroberts.fileshare.application.services;
 
+import dev.hroberts.fileshare.application.domain.ChunkedFileUpload;
 import dev.hroberts.fileshare.application.domain.DownloadableFile;
+import dev.hroberts.fileshare.application.domain.MultipartChunk;
 import dev.hroberts.fileshare.application.domain.SharedFileInfo;
+import dev.hroberts.fileshare.application.exceptions.ChunkAlreadyExistsException;
+import dev.hroberts.fileshare.application.exceptions.ChunkSizeOutOfBoundsException;
+import dev.hroberts.fileshare.application.exceptions.ChunkedUploadCompletedException;
+import dev.hroberts.fileshare.application.repositories.ChunkedFileUploadRepository;
 import dev.hroberts.fileshare.application.repositories.FileInfoRepository;
 import dev.hroberts.fileshare.persistence.filestore.IFileStore;
-import org.apache.commons.fileupload2.core.FileItemInputIterator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Service
 public class UserFileService {
     final String host;
     final FileInfoRepository fileInfoRepository;
+    final ChunkedFileUploadRepository chunkedUploadRepository;
     final IFileStore localFileStore;
 
-    public UserFileService(FileInfoRepository fileInfoRepository, IFileStore localFileStore, @Value("${host}") String host) {
+    public UserFileService(FileInfoRepository fileInfoRepository, ChunkedFileUploadRepository fileUploadRepository, IFileStore localFileStore, @Value("${host}") String host) {
         this.fileInfoRepository = fileInfoRepository;
+        this.chunkedUploadRepository = fileUploadRepository;
         this.localFileStore = localFileStore;
         this.host = host;
     }
 
-    public DownloadableFile downloadFile(String fileId) throws FileNotFoundException {
-        var fileInfo = fileInfoRepository.findById(fileId).orElseThrow();
-        fileInfo.download();
-        var filePath = localFileStore.load(fileInfo.fileId);
-        var fileName = fileInfo.fileName;
-        fileInfoRepository.save(fileInfo);
-        return new DownloadableFile(fileName, filePath);
+    public UUID initiateChunkedUpload(String name, long size, int downloadLimit) {
+        var multipartUpload = new ChunkedFileUpload(name, size, downloadLimit);
+        chunkedUploadRepository.save(multipartUpload);
+        return multipartUpload.id;
     }
 
-    public SharedFileInfo uploadFile(FileItemInputIterator fileInputIterator) throws IOException {
-        var fileInfo = new SharedFileInfo();
+    //todo fix the name generation/serialization
+    public void saveChunk(UUID uploadId, long size, int position, InputStream input) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
+        var chunkedUpload = chunkedUploadRepository.findById(uploadId.toString()).orElseThrow();
+        if (chunkedUpload.chunkExists(position)) throw new ChunkAlreadyExistsException();
+        if (chunkedUpload.currentSize + size > chunkedUpload.size) throw new ChunkSizeOutOfBoundsException();
+
+        MultipartChunk chunk = new MultipartChunk(String.format("%s.%s", chunkedUpload.name, position), size, position);
+        var actualSize = localFileStore.write(uploadId, chunk.name, input);
+
+        if (actualSize != size) {
+            localFileStore.deleteFileByName(uploadId, chunk.name);
+            throw new ChunkSizeOutOfBoundsException();
+        }
+
+        chunkedUpload.addChunk(chunk);
+        chunkedUploadRepository.save(chunkedUpload);
+    }
+
+    public SharedFileInfo completeUpload(UUID uploadId) throws ChunkedUploadCompletedException {
+        var chunkedFileUpload = chunkedUploadRepository.findById(uploadId.toString()).orElseThrow();
 
         try {
-            fileInputIterator.forEachRemaining(item -> {
-                InputStream stream = item.getInputStream();
-                if (item.isFormField()) {
-                    var fieldValue = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-                    parseField(fileInfo, item.getFieldName(), fieldValue);
-                } else {
-                    fileInfo.fileName = item.getName();
-                    localFileStore.save(stream, fileInfo.fileId);
-                }
-            });
+            for (MultipartChunk chunk : chunkedFileUpload.listChunks()) {
+                localFileStore.copy(uploadId, chunk.name, chunkedFileUpload.name, true);
+            }
+            chunkedFileUpload.listChunks().forEach(chunk -> localFileStore.deleteFileByName(uploadId, chunk.name));
+            chunkedUploadRepository.save(chunkedFileUpload);
+
+            var sharedFileInfo = new SharedFileInfo(uploadId, chunkedFileUpload.name, chunkedFileUpload.downloadLimit);
+            fileInfoRepository.save(sharedFileInfo);
+            return sharedFileInfo;
         } catch (IOException ex) {
-            localFileStore.deleteFileByName(fileInfo.fileName);
-            throw ex;
+            localFileStore.deleteFileByName(uploadId, chunkedFileUpload.name);
+            throw new ChunkedUploadCompletedException();
         }
 
-        fileInfoRepository.save(fileInfo);
-        return fileInfo;
     }
 
-    private void parseField(SharedFileInfo fileInfo, String fieldName, String fieldValue) {
-        if (fieldName.equals("downloadLimit")) {
-            fileInfo.downloadLimit = Integer.parseInt(fieldValue);
-        }
+    public DownloadableFile downloadFile(UUID uploadId, String fileName) throws FileNotFoundException {
+        var fileInfo = fileInfoRepository.findById(uploadId.toString()).orElseThrow();
+        fileInfo.download();
+        var filePath = localFileStore.load(uploadId, fileInfo.fileName);
+        fileInfoRepository.save(fileInfo);
+        return new DownloadableFile(fileName, filePath);
     }
 }

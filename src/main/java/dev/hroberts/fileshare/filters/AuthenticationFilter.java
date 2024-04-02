@@ -10,8 +10,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 public class AuthenticationFilter extends OncePerRequestFilter {
-    @Value("${api-key}") String apiKey;
     final String API_HEADER = "X-API-KEY";
+    @Value("${api-key}")
+    String apiKey;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestApiKey = request.getHeader(API_HEADER);
@@ -20,7 +22,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         } else {
             filterChain.doFilter(request, response);
 
-         //   response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid API key");
+            //   response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid API key");
         }
     }
 }

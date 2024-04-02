@@ -9,6 +9,7 @@ public class SharedFileInfoMapper {
         sharedFileInfoDto.fileId = sharedFileInfo.fileId;
         sharedFileInfoDto.fileName = sharedFileInfo.fileName;
         sharedFileInfoDto.downloadLimit = sharedFileInfo.downloadLimit;
+        sharedFileInfoDto.uploadId = sharedFileInfo.uploadId;
         return sharedFileInfoDto;
     }
 }

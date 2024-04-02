@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -25,9 +26,9 @@ public class AdminFileService {
     @Deprecated
     public SharedFileInfo uploadByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
         var fileName = extractFileName(uploadFileByPathDto.filePath);
-        var sharedFileInfo = new SharedFileInfo(fileName, uploadFileByPathDto.downloadLimit);
+        var sharedFileInfo = new SharedFileInfo(UUID.randomUUID(), fileName, uploadFileByPathDto.downloadLimit);
 
-        fileStore.copyFileIn(uploadFileByPathDto.filePath, sharedFileInfo.fileId);
+        fileStore.copyFileIn(sharedFileInfo.uploadId, uploadFileByPathDto.filePath, sharedFileInfo.fileId);
         return fileInfoRepository.save(sharedFileInfo);
     }
 
@@ -39,7 +40,7 @@ public class AdminFileService {
     public void purgeFiles() {
         var files = fileInfoRepository.findAll();
         files.forEach(sharedFileInfo -> {
-            fileStore.deleteFileByName(sharedFileInfo.fileId);
+            fileStore.deleteFileByName(UUID.randomUUID(), sharedFileInfo.fileId);
             fileInfoRepository.delete(sharedFileInfo);
         });
     }
