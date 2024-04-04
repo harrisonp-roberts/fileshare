@@ -1,6 +1,6 @@
 package dev.hroberts.fileshare.api.controllers;
 
-import dev.hroberts.fileshare.api.dtos.InitiateChunkedFileUploadRequest;
+import dev.hroberts.fileshare.api.dtos.InitiateChunkedFileUploadRequestDto;
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.exceptions.ChunkAlreadyExistsException;
@@ -31,7 +31,7 @@ public class UserFileController {
 
     //todo allow various metadata to be associated with the file
     @PostMapping("/initiate-multipart")
-    public @ResponseBody ResponseEntity<UUID> initiateMultipartUpload(@RequestBody InitiateChunkedFileUploadRequest request) {
+    public @ResponseBody ResponseEntity<UUID> initiateMultipartUpload(@RequestBody InitiateChunkedFileUploadRequestDto request) {
         var uploadId = userFileService.initiateChunkedUpload(request.name, request.size, request.downloadLimit);
         return ResponseEntity.ok(uploadId);
     }
