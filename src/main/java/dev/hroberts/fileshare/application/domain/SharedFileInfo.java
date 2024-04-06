@@ -8,9 +8,10 @@ import java.util.UUID;
 
 @RedisHash("SharedFileInfo")
 public class SharedFileInfo {
-    @Id
     public String fileId;
     public String fileName;
+
+    @Id
     public UUID uploadId;
     public int downloadLimit;
     public int remainingDownloads;

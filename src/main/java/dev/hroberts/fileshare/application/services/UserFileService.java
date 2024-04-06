@@ -76,11 +76,11 @@ public class UserFileService {
 
     }
 
-    public DownloadableFile downloadFile(UUID uploadId, String fileName) throws FileNotFoundException {
+    public DownloadableFile downloadFile(UUID uploadId) throws FileNotFoundException {
         var fileInfo = fileInfoRepository.findById(uploadId.toString()).orElseThrow();
         fileInfo.download();
         var filePath = localFileStore.load(uploadId, fileInfo.fileName);
         fileInfoRepository.save(fileInfo);
-        return new DownloadableFile(fileName, filePath);
+        return new DownloadableFile(fileInfo.fileName, filePath);
     }
 }

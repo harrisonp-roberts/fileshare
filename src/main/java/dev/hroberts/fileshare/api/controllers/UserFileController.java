@@ -60,10 +60,10 @@ public class UserFileController {
         }
     }
 
-    @GetMapping(value = "/download/{uploadId}/{fileName}")
-    public @ResponseBody ResponseEntity<Resource> getFile(@PathVariable UUID uploadId, @PathVariable String fileId) {
+    @GetMapping(value = "/download/{uploadId}")
+    public @ResponseBody ResponseEntity<Resource> getFile(@PathVariable UUID uploadId) {
         try {
-            var downloadableFile = userFileService.downloadFile(uploadId, fileId);
+            var downloadableFile = userFileService.downloadFile(uploadId);
             var response = new PathResource(downloadableFile.filePath);
             var contentLength = response.contentLength();
             var headers = new HttpHeaders();
