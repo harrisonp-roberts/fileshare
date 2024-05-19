@@ -20,47 +20,82 @@
         <div class="col-lg-8 h-75" id="drop_zone">
             <div class="card h-100">
                 <div class="card-body overflow-auto border-dashed m-2">
-                    <div class="row align-items-center h-100">
+                    <div class="row align-items-center h-100 justify-content-center">
                         <div class="col-lg-6 card-text text-center">
                             <p class="lead fs-2 text-center">Drag and drop files <br> or <br></p>
-                            <button type="button" class="btn btn-primary btn-lg">Select from your computer</button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg">Select from your computer</button>
                         </div>
-                        <div class="col-lg-6 h-100 card-text">
-                            <div class="row align-items-start">
-                                <ul class="list-group" id="selected-files">
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        this-is-an-example-file-with-a-really-long-name-2.txt
-                                        <button type="button" class="btn-close" aria-label="Close"></button>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        this-is-an-example-file-with-a-really-long-name-2.txt
-                                        <button type="button" class="btn-close" aria-label="Close"></button>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        this-is-an-example-file-with-a-really-long-name-2.txt
-                                        <button type="button" class="btn-close" aria-label="Close"></button>
-                                    </li>
-                                </ul>
+                        <div class="col-lg-6 d-flex flex-column card-text conditional-display d-none">
+                            <div class="row">
+                                <div class="col">
+                                    <ul class="list-group" id="selected-files">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            this-is-an-example-file-with-a-really-long-name-2.txt
+                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="row h-auto align-items-end">
-                                <form class="col">
-                                    <div class="row">
-                                        <div class="form-group col-md-12">
-                                            <label for="upload-name">Name</label>
-                                            <input type="text" class="form-control" id="upload-name"
-                                                   placeholder="this-is-an-example-file.txt">
+                            <div class="row mt-3">
+                                <div class="col">
+                                    <form class="conditional-display">
+                                        <div class="form-group row align-items-center">
+                                            <label for="upload-name" class="col-sm-4">Name</label>
+                                            <div class="col-sm-8">
+                                                <input type="text" class="form-control" id="upload-name"
+                                                       placeholder="this-is-an-example-file.zip">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <label for="download-limit" class="col-4">Expires in</label>
-                                        <div class="form-group col-3">
-                                            <input type="number" class="form-control" id="download-limit" placeholder="1">
+                                        <div class="form-group row align-items-center">
+                                            <label for="download-limit" class="col-sm-4">Expires in</label>
+                                            <div class="col-sm-4">
+                                                <input type="number" class="form-control" id="download-limit"
+                                                   placeholder="1">
+                                            </div>
+                                            <label for="download-limit" class="col-sm-4">days</label>
                                         </div>
-                                        <p class="col-3">days</p>
-                                    </div>
-                                </form>
+
+                                    </form>
+                                </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="card-footer conditional-display d-none">
+                    <div class="row align-items-center">
+                        <button class="btn btn-primary">Upload now</button>
                     </div>
                 </div>
             </div>
