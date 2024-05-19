@@ -3,6 +3,7 @@ window.addEventListener('DOMContentLoaded', () => {
     dropArea.addEventListener('dragover', dragOverHandler, false)
     dropArea.addEventListener('drop', dropHandler, false)
 
+    let dirty = false;
     const conditionalDivs = Array.from(document.getElementsByClassName('conditional-display'));
     const filesToUpload = [];
     const selectedFiles = document.getElementById('selected-files');
@@ -53,12 +54,17 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     function refreshView() {
+        console.log('refreshing view, view should match internal array', filesToUpload)
         if(selectedFiles.children.length === 0) {
             console.log('hiding components')
             conditionalDivs.forEach(div => {div.classList.add('d-none')})
         } else {
             console.log('not hiding components')
             conditionalDivs.forEach(div => {div.classList.remove('d-none')})
+            if(!dirty) {
+                console.log(filesToUpload[0].name)
+                document.getElementById('upload-name').value = filesToUpload[0].name;
+            }
         }
     }
 
@@ -89,14 +95,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
         console.log('removing from internal list');
         console.log(filesToUpload);
-        let file = filesToUpload.indexOf(item => {
-            console.log('is item same?');
-            console.log(item);
-            console.log(filename);
-            return item.name === filename
-        });
-
-        filesToUpload.splice(file, 1);
+        let file = filesToUpload.find(item => item.name === filename);
+        let index = filesToUpload.indexOf(file);
+        filesToUpload.splice(index, 1);
+        console.log('index of item to remove', index);
+        console.log('splicing array', filesToUpload)
+        console.log('spliced', filesToUpload);
         console.log(file);
         console.log(filesToUpload);
         refreshView();
