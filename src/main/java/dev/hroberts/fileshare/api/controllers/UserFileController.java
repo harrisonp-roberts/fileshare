@@ -1,6 +1,7 @@
 package dev.hroberts.fileshare.api.controllers;
 
 import dev.hroberts.fileshare.api.dtos.InitiateChunkedFileUploadRequestDto;
+import dev.hroberts.fileshare.api.dtos.InitiateChunkedFileUploadResponseDto;
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.exceptions.ChunkAlreadyExistsException;
@@ -31,13 +32,16 @@ public class UserFileController {
 
     //todo allow various metadata to be associated with the file
     @PostMapping("/initiate-multipart")
-    public @ResponseBody ResponseEntity<UUID> initiateMultipartUpload(@RequestBody InitiateChunkedFileUploadRequestDto request) {
+    public @ResponseBody ResponseEntity<InitiateChunkedFileUploadResponseDto> initiateMultipartUpload(@RequestBody InitiateChunkedFileUploadRequestDto request) {
         var uploadId = userFileService.initiateChunkedUpload(request.name, request.size, request.downloadLimit);
-        return ResponseEntity.ok(uploadId);
+        var response = new InitiateChunkedFileUploadResponseDto();
+        response.uploadId = uploadId;
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/upload/{uploadId}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@RequestPart MultipartFile file, @PathVariable UUID uploadId, @RequestParam int position, @RequestParam long size) {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID uploadId, @RequestParam MultipartFile file, @RequestParam int position, @RequestParam long size) {
         try {
             userFileService.saveChunk(uploadId, size, position, file.getInputStream());
         } catch (IOException e) {
@@ -50,6 +54,7 @@ public class UserFileController {
         return ResponseEntity.ok().build();
     }
 
+    //todo should be put
     @PostMapping("/complete/{uploadId}")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID uploadId) {
         try {
