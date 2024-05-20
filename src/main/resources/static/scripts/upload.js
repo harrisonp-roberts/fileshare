@@ -1,3 +1,11 @@
+/*
+TODO:
+- Tidy up this javascript, maybe make a state machine or something to handle view state properly
+- Allow multiple file upload (the foundation is there)
+- Multiple upload streams at once
+- Better UX for finishing
+ */
+
 window.addEventListener('DOMContentLoaded', () => {
     const chunkSize = (1024 * 1024 * 50);
     const baseUrl = "http://localhost:8080/files/";
