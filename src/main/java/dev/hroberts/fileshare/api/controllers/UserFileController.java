@@ -41,9 +41,9 @@ public class UserFileController {
     }
 
     @PostMapping("/upload/{uploadId}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID uploadId, @RequestParam MultipartFile file, @RequestParam int position, @RequestParam long size) {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID uploadId, @RequestParam MultipartFile file, @RequestParam int chunkIndex, @RequestParam long size) {
         try {
-            userFileService.saveChunk(uploadId, size, position, file.getInputStream());
+            userFileService.saveChunk(uploadId, size, chunkIndex, file.getInputStream());
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         } catch (ChunkAlreadyExistsException e) {

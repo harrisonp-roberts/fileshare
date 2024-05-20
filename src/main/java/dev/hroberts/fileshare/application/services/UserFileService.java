@@ -39,12 +39,12 @@ public class UserFileService {
     }
 
     //todo fix the name generation/serialization
-    public void saveChunk(UUID uploadId, long size, int position, InputStream input) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
+    public void saveChunk(UUID uploadId, long size, int chunkIndex, InputStream input) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
         var chunkedUpload = chunkedUploadRepository.findById(uploadId.toString()).orElseThrow();
-        if (chunkedUpload.chunkExists(position)) throw new ChunkAlreadyExistsException();
+        if (chunkedUpload.chunkExists(chunkIndex)) throw new ChunkAlreadyExistsException();
         if (chunkedUpload.currentSize + size > chunkedUpload.size) throw new ChunkSizeOutOfBoundsException();
 
-        MultipartChunk chunk = new MultipartChunk(String.format("%s.%s", chunkedUpload.name, position), size, position);
+        MultipartChunk chunk = new MultipartChunk(String.format("%s.%s", chunkedUpload.name, chunkIndex), size, chunkIndex);
         var actualSize = localFileStore.write(uploadId, chunk.name, input);
 
         if (actualSize != size) {
