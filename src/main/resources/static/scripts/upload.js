@@ -4,24 +4,105 @@ TODO:
 - Allow multiple file upload (the foundation is there)
 - Multiple upload streams at once
 - Better UX for finishing
+- Takes a long time to complete large file upload (to put pieces together).
+-   Maybe look at concatenating the parts as they get uploaded? Or show user it's completed earlier or something
  */
+
+const states = {
+    SELECT: "select",
+    READY: "ready",
+    UPLOAD: "upload",
+    COMPLETE: "complete"
+}
+
+const transitions = {
+    BeginUpload: {
+        [states.SELECT]: states.UPLOAD
+    },
+    UploadComplete: {
+        [states.UPLOAD]: states.COMPLETE
+    },
+    NewUpload: {
+        [states.COMPLETE]: states.UPLOAD
+    }
+}
+
+class view {
+    constructor(visible, hidden) {
+        this.visible = visible;
+        this.hidden = hidden;
+    }
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     const chunkSize = (1024 * 1024 * 50);
     const baseUrl = "http://localhost:8080/files/";
-    let conditionalDivs = Array.from(document.getElementsByClassName('conditional-display'));
+    const initialState = states.SELECT;
 
-    let filesToUpload = Array.from([]);
-    let selectedFiles = document.getElementById('selected-files');
-    let dropArea = document.getElementById('drop_zone');
-    let submitButton = document.getElementById('submit');
+    let conditionalDivs;
+    let filesToUpload;
+    let selectedFiles;
+    let dropArea ;
+    let submitButton;
+    let state;
+    let dirty;
 
-    let dirty = false;
-    let uploading = false;
+    let selectView;
+    let selectedView;
+    let uploadView;
+    let doneView;
 
-    dropArea.addEventListener('dragover', dragOverHandler, false)
-    dropArea.addEventListener('drop', dropHandler, false)
-    submitButton.addEventListener('click', submit, false);
+    init();
+
+    function init() {
+        conditionalDivs = Array.from(document.getElementsByClassName('conditional-display'));
+        filesToUpload = Array.from([]);
+        selectedFiles = document.getElementById('selected-files');
+        dropArea = document.getElementById('drop_zone');
+        submitButton = document.getElementById('submit');
+        dirty = false;
+
+        let uploadInformation = document.getElementById('upload-information');
+        let submitElement = document.getElementById('submit-element');
+        let progressElement = document.getElementById('progress-element');
+        let instructionsElement = document.getElementById('instructions-column');
+        let footer = document.getElementById('footer');
+
+        selectView = new view([instructionsElement], [footer, uploadInformation, submitElement, progressElement])
+        selectedView = new view([footer, instructionsElement, uploadInformation, submitElement], [progressElement]);
+        uploadView = new view([footer, uploadInformation, uploadInformation, progressElement], [submitElement])
+        doneView = selectView;
+
+        dropArea.addEventListener('dragover', dragOverHandler, false)
+        dropArea.addEventListener('drop', dropHandler, false)
+        submitButton.addEventListener('click', submit, false);
+        setState(initialState);
+
+    }
+
+    function setView(view) {
+        view.visible.forEach(element => {element.classList.remove('d-none')});
+        view.hidden.forEach(element => {element.classList.add('d-none')});
+    }
+
+    function setState(newState) {
+        if(state === newState) return;
+        //todo validate state transitions...
+        //todo bring all the names into line (ready/selected should be one. done/complete should be one)
+        if(newState === states.SELECT) {
+            setView(selectView);
+            state = states.SELECT;
+        } else if (newState === states.READY) {
+            setView(selectedView);
+            state = states.READY;
+        } else if (newState === states.UPLOAD) {
+            setView(uploadView);
+            state = states.UPLOAD;
+        } else if (newState === states.COMPLETE) {
+            setView(doneView);
+            state = states.READY;
+        }
+    }
 
     function dragOverHandler(ev) {
         // Prevent default behavior (Prevent file from being opened)
@@ -55,8 +136,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 console.log(`… file[${i}].name = ${file.name}`);
             });
         }
-
-        refreshView();
     }
 
     function addFileToUpload(file) {
@@ -68,10 +147,10 @@ window.addEventListener('DOMContentLoaded', () => {
         if (filesToUpload.some(item => item.name === file.name)) {
             return;
         }
-        console.log("adding file");
         filesToUpload.push(file);
         addSelectedFilesToView(file.name);
-        refreshView();
+
+        setState(states.READY);
     }
 
     function updateProgress(percent) {
@@ -81,31 +160,7 @@ window.addEventListener('DOMContentLoaded', () => {
         console.log('updating with percent', percent);
     }
 
-    function refreshView() {
-        console.log('refreshing view');
-        if(!uploading) {
-            document.getElementById('submit').classList.remove('d-none');
-            document.getElementById('progress').classList.add('d-none');
-        } else {
-            document.getElementById('submit').classList.add('d-none');
-            document.getElementById('progress').classList.remove('d-none');
-        }
-
-        if (selectedFiles.children.length === 0) {
-            conditionalDivs.forEach(div => {
-                div.classList.add('d-none')
-            })
-        } else {
-            conditionalDivs.forEach(div => {
-                div.classList.remove('d-none')
-            })
-            if (!dirty) {
-                console.log(filesToUpload[0].name)
-                document.getElementById('upload-name').value = filesToUpload[0].name;
-            }
-        }
-    }
-
+    //todo get rid of this and render directly from selected files.
     function addSelectedFilesToView(filename) {
         let listItem = document.createElement('li');
         let closeButton = document.createElement("button");
@@ -138,21 +193,18 @@ window.addEventListener('DOMContentLoaded', () => {
         let file = filesToUpload.find(item => item.name === filename);
         let index = filesToUpload.indexOf(file);
         filesToUpload.splice(index, 1);
-        refreshView();
     }
 
     async function submit() {
-        document.getElementById('submit').classList.add('d-none');
-        uploading = true;
-        refreshView();
+        setState(states.UPLOAD);
 
         const file = filesToUpload[0];
         const uploadId = await initiate();
         await doUpload(uploadId, file);
         await complete(uploadId);
 
-        uploading = false;
         let downloadLink = baseUrl + 'download/' + uploadId;
+        setState(states.COMPLETE);
         alert('Download link: ' + downloadLink);
     }
 
