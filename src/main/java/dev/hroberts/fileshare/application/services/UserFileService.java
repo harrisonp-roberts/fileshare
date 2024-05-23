@@ -10,9 +10,12 @@ import dev.hroberts.fileshare.application.exceptions.ChunkedUploadCompletedExcep
 import dev.hroberts.fileshare.application.repositories.ChunkedFileUploadRepository;
 import dev.hroberts.fileshare.application.repositories.FileInfoRepository;
 import dev.hroberts.fileshare.persistence.filestore.IFileStore;
+import net.glxn.qrgen.javase.QRCode;
+import net.glxn.qrgen.core.image.ImageType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +42,12 @@ public class UserFileService {
     }
 
     //todo fix the name generation/serialization
-    public void saveChunk(UUID uploadId, long size, int position, InputStream input) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
+    public void saveChunk(UUID uploadId, long size, int chunkIndex, InputStream input) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
         var chunkedUpload = chunkedUploadRepository.findById(uploadId.toString()).orElseThrow();
-        if (chunkedUpload.chunkExists(position)) throw new ChunkAlreadyExistsException();
+        if (chunkedUpload.chunkExists(chunkIndex)) throw new ChunkAlreadyExistsException();
         if (chunkedUpload.currentSize + size > chunkedUpload.size) throw new ChunkSizeOutOfBoundsException();
 
-        MultipartChunk chunk = new MultipartChunk(String.format("%s.%s", chunkedUpload.name, position), size, position);
+        MultipartChunk chunk = new MultipartChunk(String.format("%s.%s", chunkedUpload.name, chunkIndex), size, chunkIndex);
         var actualSize = localFileStore.write(uploadId, chunk.name, input);
 
         if (actualSize != size) {
@@ -82,5 +85,11 @@ public class UserFileService {
         var filePath = localFileStore.load(uploadId, fileInfo.fileName);
         fileInfoRepository.save(fileInfo);
         return new DownloadableFile(fileInfo.fileName, filePath);
+    }
+
+    public ByteArrayOutputStream generateQrCode(UUID uploadId) {
+        var fileInfo = fileInfoRepository.findById(uploadId.toString()).orElseThrow();
+        var downloadUrl = host + "/download/" + uploadId;
+        return QRCode.from(downloadUrl).withSize(250, 250).to(ImageType.PNG).stream();
     }
 }

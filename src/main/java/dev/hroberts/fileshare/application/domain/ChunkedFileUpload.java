@@ -31,9 +31,9 @@ public class ChunkedFileUpload {
     }
 
     public void addChunk(MultipartChunk chunk) throws ChunkAlreadyExistsException {
-        if (chunks.containsKey(chunk.position)) throw new ChunkAlreadyExistsException();
+        if (chunks.containsKey(chunk.chunkIndex)) throw new ChunkAlreadyExistsException();
         currentSize += chunk.size;
-        chunks.put(chunk.position, chunk);
+        chunks.put(chunk.chunkIndex, chunk);
     }
 
     public boolean chunkExists(int chunkIndex) {
@@ -43,7 +43,7 @@ public class ChunkedFileUpload {
     public List<MultipartChunk> listChunks() {
         return chunks.values()
                 .stream()
-                .sorted(Comparator.comparing(o -> o.position))
+                .sorted(Comparator.comparing(o -> o.chunkIndex))
                 .toList();
     }
 }

@@ -1,12 +1,14 @@
 package dev.hroberts.fileshare.api.controllers;
 
 import dev.hroberts.fileshare.api.dtos.InitiateChunkedFileUploadRequestDto;
+import dev.hroberts.fileshare.api.dtos.InitiateChunkedFileUploadResponseDto;
 import dev.hroberts.fileshare.api.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.exceptions.ChunkAlreadyExistsException;
 import dev.hroberts.fileshare.application.exceptions.ChunkSizeOutOfBoundsException;
 import dev.hroberts.fileshare.application.exceptions.ChunkedUploadCompletedException;
 import dev.hroberts.fileshare.application.services.UserFileService;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -31,15 +33,18 @@ public class UserFileController {
 
     //todo allow various metadata to be associated with the file
     @PostMapping("/initiate-multipart")
-    public @ResponseBody ResponseEntity<UUID> initiateMultipartUpload(@RequestBody InitiateChunkedFileUploadRequestDto request) {
+    public @ResponseBody ResponseEntity<InitiateChunkedFileUploadResponseDto> initiateMultipartUpload(@RequestBody InitiateChunkedFileUploadRequestDto request) {
         var uploadId = userFileService.initiateChunkedUpload(request.name, request.size, request.downloadLimit);
-        return ResponseEntity.ok(uploadId);
+        var response = new InitiateChunkedFileUploadResponseDto();
+        response.uploadId = uploadId;
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/upload/{uploadId}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@RequestPart MultipartFile file, @PathVariable UUID uploadId, @RequestParam int position, @RequestParam long size) {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID uploadId, @RequestParam MultipartFile file, @RequestParam int chunkIndex, @RequestParam long size) {
         try {
-            userFileService.saveChunk(uploadId, size, position, file.getInputStream());
+            userFileService.saveChunk(uploadId, size, chunkIndex, file.getInputStream());
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         } catch (ChunkAlreadyExistsException e) {
@@ -50,6 +55,14 @@ public class UserFileController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping(value="qr-code/{uploadId}", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<Resource> getQrCode(@PathVariable UUID uploadId) {
+        var qrByteStream = userFileService.generateQrCode(uploadId);
+        var resource = new ByteArrayResource(qrByteStream.toByteArray());
+        return ResponseEntity.ok(resource);
+    }
+
+    //todo should be put
     @PostMapping("/complete/{uploadId}")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID uploadId) {
         try {
