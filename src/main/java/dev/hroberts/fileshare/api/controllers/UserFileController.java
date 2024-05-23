@@ -8,6 +8,7 @@ import dev.hroberts.fileshare.application.exceptions.ChunkAlreadyExistsException
 import dev.hroberts.fileshare.application.exceptions.ChunkSizeOutOfBoundsException;
 import dev.hroberts.fileshare.application.exceptions.ChunkedUploadCompletedException;
 import dev.hroberts.fileshare.application.services.UserFileService;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -52,6 +53,13 @@ public class UserFileController {
             throw new RuntimeException(e);
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value="qr-code/{uploadId}", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<Resource> getQrCode(@PathVariable UUID uploadId) {
+        var qrByteStream = userFileService.generateQrCode(uploadId);
+        var resource = new ByteArrayResource(qrByteStream.toByteArray());
+        return ResponseEntity.ok(resource);
     }
 
     //todo should be put

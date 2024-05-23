@@ -1,6 +1,5 @@
 /*
 TODO:
-- Tidy up this javascript, maybe make a state machine or something to handle view state properly
 - Allow multiple file upload (the foundation is there)
 - Multiple upload streams at once
 - Better UX for finishing
@@ -42,15 +41,20 @@ window.addEventListener('DOMContentLoaded', () => {
     let conditionalDivs;
     let filesToUpload;
     let selectedFiles;
-    let dropArea ;
+    let dropArea;
     let submitButton;
+    let selectButton;
+    let copyButton;
+    let linkExpiry;
     let state;
     let dirty;
 
+    let downloadUrl;
+
     let selectView;
-    let selectedView;
+    let readyView;
     let uploadView;
-    let doneView;
+    let completeView;
 
     init();
 
@@ -60,6 +64,9 @@ window.addEventListener('DOMContentLoaded', () => {
         selectedFiles = document.getElementById('selected-files');
         dropArea = document.getElementById('drop_zone');
         submitButton = document.getElementById('submit');
+        selectButton = document.getElementById('select-file');
+        copyButton = document.getElementById('copy-link');
+        linkExpiry = document.getElementById('link-expiry');
         dirty = false;
 
         let uploadInformation = document.getElementById('upload-information');
@@ -67,40 +74,58 @@ window.addEventListener('DOMContentLoaded', () => {
         let progressElement = document.getElementById('progress-element');
         let instructionsElement = document.getElementById('instructions-column');
         let footer = document.getElementById('footer');
+        let completed = document.getElementById('completed');
+        let dropContainer = document.getElementById('drop-container');
 
-        selectView = new view([instructionsElement], [footer, uploadInformation, submitElement, progressElement])
-        selectedView = new view([footer, instructionsElement, uploadInformation, submitElement], [progressElement]);
-        uploadView = new view([footer, uploadInformation, uploadInformation, progressElement], [submitElement])
-        doneView = selectView;
+        selectView = new view([dropContainer, instructionsElement], [footer, completed, uploadInformation, submitElement, progressElement])
+        readyView = new view([dropContainer, footer, instructionsElement, uploadInformation, submitElement], [completed, progressElement]);
+        uploadView = new view([dropContainer, footer, uploadInformation, uploadInformation, progressElement], [completed, submitElement])
+        completeView = new view([completed], [dropContainer, footer, instructionsElement, uploadInformation, submitElement, progressElement])
 
         dropArea.addEventListener('dragover', dragOverHandler, false)
         dropArea.addEventListener('drop', dropHandler, false)
         submitButton.addEventListener('click', submit, false);
+        selectButton.addEventListener('click', openFilePicker, false);
+        copyButton.addEventListener('click', copyLink, false);
         setState(initialState);
 
     }
 
+    function openFilePicker() {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = _ => {
+            // you can use this method to get file and perform respective operations
+            let files = Array.from(input.files);
+            addFileToUpload(files[0]);
+        };
+        input.click();
+    }
+
     function setView(view) {
-        view.visible.forEach(element => {element.classList.remove('d-none')});
-        view.hidden.forEach(element => {element.classList.add('d-none')});
+        view.visible.forEach(element => {
+            element.classList.remove('d-none')
+        });
+        view.hidden.forEach(element => {
+            element.classList.add('d-none')
+        });
     }
 
     function setState(newState) {
-        if(state === newState) return;
+        if (state === newState) return;
         //todo validate state transitions...
-        //todo bring all the names into line (ready/selected should be one. done/complete should be one)
-        if(newState === states.SELECT) {
+        if (newState === states.SELECT) {
             setView(selectView);
             state = states.SELECT;
         } else if (newState === states.READY) {
-            setView(selectedView);
+            setView(readyView);
             state = states.READY;
         } else if (newState === states.UPLOAD) {
             setView(uploadView);
             state = states.UPLOAD;
         } else if (newState === states.COMPLETE) {
-            setView(doneView);
-            state = states.READY;
+            setView(completeView);
+            state = states.COMPLETE;
         }
     }
 
@@ -177,7 +202,7 @@ window.addEventListener('DOMContentLoaded', () => {
         selectedFiles.append(listItem);
 
         //if user hasn't set a name, and adding first file to list
-        if(!dirty && selectedFiles.children.length === 1) {
+        if (!dirty && selectedFiles.children.length === 1) {
             document.getElementById('upload-name').value = filename;
         }
     }
@@ -203,9 +228,25 @@ window.addEventListener('DOMContentLoaded', () => {
         await doUpload(uploadId, file);
         await complete(uploadId);
 
+        await showDownloadInfo(uploadId);
+    }
+
+    async function showDownloadInfo(uploadId) {
         let downloadLink = baseUrl + 'download/' + uploadId;
+        let qrUrl = baseUrl + 'qr-code/' + uploadId;
+
+        fetch(qrUrl).then(res => {
+            return res.blob()
+        }).then(blob => {
+            let img = URL.createObjectURL(blob);
+            document.getElementById('qr-code').setAttribute('src', img);
+        })
+
+        let downloadLimit = document.getElementById('download-limit').value;
+        console.log("downlaodLimit" + downloadLimit);
+        linkExpiry.value = "The link to your file will expire in " + downloadLimit + " days";
+
         setState(states.COMPLETE);
-        alert('Download link: ' + downloadLink);
     }
 
     function getParams() {
@@ -214,13 +255,12 @@ window.addEventListener('DOMContentLoaded', () => {
             fileName: filesToUpload[0].name
         };
 
-        if(dirty) {
+        if (dirty) {
             params.fileName = document.getElementById('upload-name').value;
             params.downloadLimit = document.getElementById('download-limit').value;
         }
         return params;
     }
-
 
     async function initiate() {
         let params = getParams();
@@ -270,6 +310,10 @@ window.addEventListener('DOMContentLoaded', () => {
         return await fetch(baseUrl + 'complete/' + uploadId, {
             method: 'POST'
         }).then(response => response.json());
+    }
+
+    function copyLink() {
+        navigator.clipboard.writeText(downloadUrl);
     }
 });
 

@@ -17,13 +17,24 @@
         </div>
     </div>
     <div class="row justify-content-center align-items-center h-75">
+
         <div class="col-lg-8 h-75" id="drop_zone">
             <div class="card h-100">
                 <div class="card-body overflow-auto border-dashed m-2">
+                    <div id="completed" class="d-none row align-items-center h-100 justify-content-center">
+                        <div class="col-sm-3 card-text text-center">
+                            <img id="qr-code" src="" alt="qr code">
+                        </div>
+                        <div id="download-link" class="col-lg-6 card-text text-center">
+                            <h1 id="link-expiry"></h1>
+                            <br>
+                            <button id="copy-link" class="btn btn-secondary btn-md">Copy Link</button>
+                        </div>
+                    </div>
                     <div id="drop-container" class="row align-items-center h-100 justify-content-center">
                         <div id="instructions-column" class="col-lg-6 select-view card-text text-center">
                             <p class="lead fs-2 text-center">Drag and drop files <br> or <br></p>
-                            <button type="button" class="btn btn-outline-secondary btn-lg">Select from your computer
+                            <button id="select-file" type="button" class="btn btn-outline-secondary btn-lg">Select from your computer
                             </button>
                         </div>
                         <div id="upload-information" class="col-lg-6 d-flex flex-column card-text d-none">
@@ -62,7 +73,7 @@
                         <button id="submit" class="btn btn-primary">Upload now</button>
                     </div>
                     <div id="progress-element" class="progress d-none">
-                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
                     </div>
                 </div>
             </div>

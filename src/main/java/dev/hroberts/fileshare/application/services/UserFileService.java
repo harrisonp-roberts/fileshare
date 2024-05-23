@@ -10,9 +10,12 @@ import dev.hroberts.fileshare.application.exceptions.ChunkedUploadCompletedExcep
 import dev.hroberts.fileshare.application.repositories.ChunkedFileUploadRepository;
 import dev.hroberts.fileshare.application.repositories.FileInfoRepository;
 import dev.hroberts.fileshare.persistence.filestore.IFileStore;
+import net.glxn.qrgen.javase.QRCode;
+import net.glxn.qrgen.core.image.ImageType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,5 +85,11 @@ public class UserFileService {
         var filePath = localFileStore.load(uploadId, fileInfo.fileName);
         fileInfoRepository.save(fileInfo);
         return new DownloadableFile(fileInfo.fileName, filePath);
+    }
+
+    public ByteArrayOutputStream generateQrCode(UUID uploadId) {
+        var fileInfo = fileInfoRepository.findById(uploadId.toString()).orElseThrow();
+        var downloadUrl = host + "/download/" + uploadId;
+        return QRCode.from(downloadUrl).to(ImageType.PNG).stream();
     }
 }
