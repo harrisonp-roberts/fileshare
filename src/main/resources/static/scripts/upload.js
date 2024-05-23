@@ -232,19 +232,18 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     async function showDownloadInfo(uploadId) {
-        let downloadLink = baseUrl + 'download/' + uploadId;
         let qrUrl = baseUrl + 'qr-code/' + uploadId;
-
-        fetch(qrUrl).then(res => {
+        downloadUrl =  baseUrl + "download/" + uploadId;
+        await fetch(qrUrl).then(res => {
             return res.blob()
         }).then(blob => {
             let img = URL.createObjectURL(blob);
             document.getElementById('qr-code').setAttribute('src', img);
         })
 
-        let downloadLimit = document.getElementById('download-limit').value;
+        let downloadLimit = 1;
         console.log("downlaodLimit" + downloadLimit);
-        linkExpiry.value = "The link to your file will expire in " + downloadLimit + " days";
+        linkExpiry.innerText = "The link to your file will expire in " + downloadLimit + " days";
 
         setState(states.COMPLETE);
     }

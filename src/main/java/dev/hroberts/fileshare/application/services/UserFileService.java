@@ -90,6 +90,6 @@ public class UserFileService {
     public ByteArrayOutputStream generateQrCode(UUID uploadId) {
         var fileInfo = fileInfoRepository.findById(uploadId.toString()).orElseThrow();
         var downloadUrl = host + "/download/" + uploadId;
-        return QRCode.from(downloadUrl).to(ImageType.PNG).stream();
+        return QRCode.from(downloadUrl).withSize(250, 250).to(ImageType.PNG).stream();
     }
 }
