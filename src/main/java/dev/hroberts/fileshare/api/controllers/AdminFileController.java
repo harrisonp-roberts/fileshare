@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("admin")
 public class AdminFileController {
     private final AdminFileService fileAdminService;

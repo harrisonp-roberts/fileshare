@@ -92,4 +92,8 @@ public class UserFileService {
         var downloadUrl = host + "/download/" + uploadId;
         return QRCode.from(downloadUrl).withSize(250, 250).to(ImageType.PNG).stream();
     }
+
+    public SharedFileInfo getFileInfo(UUID uploadId) {
+        return fileInfoRepository.findById(uploadId.toString()).orElseThrow();
+    }
 }

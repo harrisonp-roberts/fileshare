@@ -38,7 +38,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const baseUrl = "http://localhost:8080/files/";
     const initialState = states.SELECT;
 
-    let conditionalDivs;
     let filesToUpload;
     let selectedFiles;
     let dropArea;
@@ -59,7 +58,6 @@ window.addEventListener('DOMContentLoaded', () => {
     init();
 
     function init() {
-        conditionalDivs = Array.from(document.getElementsByClassName('conditional-display'));
         filesToUpload = Array.from([]);
         selectedFiles = document.getElementById('selected-files');
         dropArea = document.getElementById('drop_zone');
