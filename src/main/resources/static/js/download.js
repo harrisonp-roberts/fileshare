@@ -113,7 +113,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     async function downloadFile() {
-        document.getElementById('my_iframe').src = downloadUrl + fileId;
+        document.getElementById('qr-code-iframe').src = downloadUrl + fileId;
     }
 
 });

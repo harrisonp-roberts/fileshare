@@ -54,13 +54,6 @@ public class UserFileController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value="qr-code/{uploadId}", produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<Resource> getQrCode(@PathVariable UUID uploadId) {
-        var qrByteStream = userFileService.generateQrCode(uploadId);
-        var resource = new ByteArrayResource(qrByteStream.toByteArray());
-        return ResponseEntity.ok(resource);
-    }
-
     //todo should be put
     @PostMapping("/complete/{uploadId}")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID uploadId) {

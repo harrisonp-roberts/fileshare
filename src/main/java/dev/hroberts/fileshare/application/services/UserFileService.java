@@ -19,6 +19,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -87,10 +89,11 @@ public class UserFileService {
         return new DownloadableFile(fileInfo.fileName, filePath);
     }
 
-    public ByteArrayOutputStream generateQrCode(UUID uploadId) {
-        var fileInfo = fileInfoRepository.findById(uploadId.toString()).orElseThrow();
+    public String generateQrCode(UUID uploadId) {
+        fileInfoRepository.findById(uploadId.toString()).orElseThrow();
         var downloadUrl = host + "/download/" + uploadId;
-        return QRCode.from(downloadUrl).withSize(250, 250).to(ImageType.PNG).stream();
+        var qrCodeByteStream = QRCode.from(downloadUrl).withSize(250, 250).to(ImageType.PNG).stream();
+        return new String(Base64.getEncoder().encode(qrCodeByteStream.toByteArray()));
     }
 
     public SharedFileInfo getFileInfo(UUID uploadId) {
