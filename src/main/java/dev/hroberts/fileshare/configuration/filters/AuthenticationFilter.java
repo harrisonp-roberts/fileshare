@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.filters;
+package dev.hroberts.fileshare.configuration.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

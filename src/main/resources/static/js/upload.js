@@ -35,7 +35,8 @@ class view {
 
 window.addEventListener('DOMContentLoaded', () => {
     const chunkSize = (1024 * 1024 * 50);
-    const baseUrl = "http://localhost:8080/files/";
+    const baseUrl = host + "/files/";
+    console.log("Base URL: ", baseUrl);
     const initialState = states.SELECT;
 
     let filesToUpload;
