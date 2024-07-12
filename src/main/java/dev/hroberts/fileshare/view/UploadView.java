@@ -17,7 +17,6 @@ public class UploadView {
         this.userFileService = userFileService;
     }
 
-
     @GetMapping("/")
     public String index(Model model) {
         model.addAttribute( "host", host);

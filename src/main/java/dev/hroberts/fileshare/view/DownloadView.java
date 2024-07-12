@@ -1,7 +1,6 @@
 package dev.hroberts.fileshare.view;
 
 import dev.hroberts.fileshare.application.services.UserFileService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
