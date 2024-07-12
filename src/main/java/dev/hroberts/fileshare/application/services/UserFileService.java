@@ -97,6 +97,6 @@ public class UserFileService {
     }
 
     public SharedFileInfo getFileInfo(UUID uploadId) {
-        return fileInfoRepository.findById(uploadId.toString()).orElseThrow();
+        return fileInfoRepository.findById(uploadId.toString()).orElse(null);
     }
 }

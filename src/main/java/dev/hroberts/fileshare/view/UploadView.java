@@ -29,6 +29,7 @@ public class UploadView {
         var qrCode = userFileService.generateQrCode(id);
         model.addAttribute("fileInfo", fileInfo);
         model.addAttribute("qrCode", qrCode);
+        model.addAttribute("host", host);
         return "complete";
     }
 }

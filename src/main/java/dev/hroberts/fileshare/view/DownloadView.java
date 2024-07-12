@@ -22,7 +22,7 @@ public class DownloadView {
     @GetMapping("/download")
     public String download(Model model) {
         model.addAttribute("host", host);
-        return "download";
+        return "redirect:/";
     }
 
     @GetMapping("/download/{id}")
