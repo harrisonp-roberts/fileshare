@@ -10,20 +10,7 @@ TODO:
 const states = {
     SELECT: "select",
     READY: "ready",
-    UPLOAD: "upload",
-    COMPLETE: "complete"
-}
-
-const transitions = {
-    BeginUpload: {
-        [states.SELECT]: states.UPLOAD
-    },
-    UploadComplete: {
-        [states.UPLOAD]: states.COMPLETE
-    },
-    NewUpload: {
-        [states.COMPLETE]: states.UPLOAD
-    }
+    UPLOAD: "upload"
 }
 
 class view {
@@ -35,21 +22,17 @@ class view {
 
 window.addEventListener('DOMContentLoaded', () => {
     const chunkSize = (1024 * 1024 * 50);
-    const baseUrl = "http://localhost:8080/files/";
+    const baseUrl = host + "/files/";
+    console.log("Base URL: ", baseUrl);
     const initialState = states.SELECT;
 
-    let conditionalDivs;
     let filesToUpload;
     let selectedFiles;
     let dropArea;
     let submitButton;
     let selectButton;
-    let copyButton;
-    let linkExpiry;
     let state;
     let dirty;
-
-    let downloadUrl;
 
     let selectView;
     let readyView;
@@ -59,14 +42,11 @@ window.addEventListener('DOMContentLoaded', () => {
     init();
 
     function init() {
-        conditionalDivs = Array.from(document.getElementsByClassName('conditional-display'));
         filesToUpload = Array.from([]);
         selectedFiles = document.getElementById('selected-files');
         dropArea = document.getElementById('drop_zone');
         submitButton = document.getElementById('submit');
         selectButton = document.getElementById('select-file');
-        copyButton = document.getElementById('copy-link');
-        linkExpiry = document.getElementById('link-expiry');
         dirty = false;
 
         let uploadInformation = document.getElementById('upload-information');
@@ -74,21 +54,17 @@ window.addEventListener('DOMContentLoaded', () => {
         let progressElement = document.getElementById('progress-element');
         let instructionsElement = document.getElementById('instructions-column');
         let footer = document.getElementById('footer');
-        let completed = document.getElementById('completed');
         let dropContainer = document.getElementById('drop-container');
 
-        selectView = new view([dropContainer, instructionsElement], [footer, completed, uploadInformation, submitElement, progressElement])
-        readyView = new view([dropContainer, footer, instructionsElement, uploadInformation, submitElement], [completed, progressElement]);
-        uploadView = new view([dropContainer, footer, uploadInformation, uploadInformation, progressElement], [completed, submitElement])
-        completeView = new view([completed], [dropContainer, footer, instructionsElement, uploadInformation, submitElement, progressElement])
+        selectView = new view([dropContainer, instructionsElement], [footer, uploadInformation, submitElement, progressElement])
+        readyView = new view([dropContainer, footer, instructionsElement, uploadInformation, submitElement], [progressElement]);
+        uploadView = new view([dropContainer, footer, uploadInformation, uploadInformation, progressElement], [submitElement])
 
         dropArea.addEventListener('dragover', dragOverHandler, false)
         dropArea.addEventListener('drop', dropHandler, false)
         submitButton.addEventListener('click', submit, false);
         selectButton.addEventListener('click', openFilePicker, false);
-        copyButton.addEventListener('click', copyLink, false);
         setState(initialState);
-
     }
 
     function openFilePicker() {
@@ -228,24 +204,7 @@ window.addEventListener('DOMContentLoaded', () => {
         await doUpload(uploadId, file);
         await complete(uploadId);
 
-        await showDownloadInfo(uploadId);
-    }
-
-    async function showDownloadInfo(uploadId) {
-        let qrUrl = baseUrl + 'qr-code/' + uploadId;
-        downloadUrl =  baseUrl + "download/" + uploadId;
-        await fetch(qrUrl).then(res => {
-            return res.blob()
-        }).then(blob => {
-            let img = URL.createObjectURL(blob);
-            document.getElementById('qr-code').setAttribute('src', img);
-        })
-
-        let downloadLimit = 1;
-        console.log("downlaodLimit" + downloadLimit);
-        linkExpiry.innerText = "The link to your file will expire in " + downloadLimit + " days";
-
-        setState(states.COMPLETE);
+        window.location.href = host + "/complete/" + uploadId;
     }
 
     function getParams() {
@@ -309,10 +268,6 @@ window.addEventListener('DOMContentLoaded', () => {
         return await fetch(baseUrl + 'complete/' + uploadId, {
             method: 'POST'
         }).then(response => response.json());
-    }
-
-    function copyLink() {
-        navigator.clipboard.writeText(downloadUrl);
     }
 });
 

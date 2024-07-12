@@ -15,14 +15,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping("files")
 public class UserFileController {
     private final UserFileService userFileService;
@@ -55,13 +54,6 @@ public class UserFileController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping(value="qr-code/{uploadId}", produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<Resource> getQrCode(@PathVariable UUID uploadId) {
-        var qrByteStream = userFileService.generateQrCode(uploadId);
-        var resource = new ByteArrayResource(qrByteStream.toByteArray());
-        return ResponseEntity.ok(resource);
-    }
-
     //todo should be put
     @PostMapping("/complete/{uploadId}")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID uploadId) {
@@ -71,6 +63,12 @@ public class UserFileController {
         } catch (ChunkedUploadCompletedException e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/info/{uploadId}")
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> getInfo(@PathVariable UUID uploadId) {
+        var response = userFileService.getFileInfo(uploadId);
+        return ResponseEntity.ok(SharedFileInfoMapper.MapDomainToDto(response));
     }
 
     @GetMapping(value = "/download/{uploadId}")
