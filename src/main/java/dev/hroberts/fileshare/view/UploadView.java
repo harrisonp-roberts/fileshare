@@ -11,15 +11,17 @@ import java.util.UUID;
 
 @Controller
 public class UploadView {
-    @Value("${host}") String host;
     private final UserFileService userFileService;
+    @Value("${host}")
+    String host;
+
     public UploadView(UserFileService userFileService) {
         this.userFileService = userFileService;
     }
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute( "host", host);
+        model.addAttribute("host", host);
         return "upload";
     }
 

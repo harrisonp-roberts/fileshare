@@ -1,6 +1,7 @@
 package dev.hroberts.fileshare.application.domain;
 
 import dev.hroberts.fileshare.application.exceptions.ChunkAlreadyExistsException;
+import dev.hroberts.fileshare.application.exceptions.ChunkSizeOutOfBoundsException;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -30,10 +31,13 @@ public class ChunkedFileUpload {
         this.downloadLimit = downloadLimit;
     }
 
-    public void addChunk(MultipartChunk chunk) throws ChunkAlreadyExistsException {
-        if (chunks.containsKey(chunk.chunkIndex)) throw new ChunkAlreadyExistsException();
-        currentSize += chunk.size;
-        chunks.put(chunk.chunkIndex, chunk);
+    public MultipartChunk addChunk(long chunkSize, int chunkIndex) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
+        if (chunkExists(chunkIndex)) throw new ChunkAlreadyExistsException();
+        if (currentSize + chunkSize > size) throw new ChunkSizeOutOfBoundsException();
+        var chunkName = String.format("%s.%s", name, chunkIndex);
+        var chunk = new MultipartChunk(chunkName, chunkSize, chunkIndex);
+        chunks.put(chunkIndex, chunk);
+        return chunk;
     }
 
     public boolean chunkExists(int chunkIndex) {

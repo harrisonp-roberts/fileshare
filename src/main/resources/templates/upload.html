@@ -1,16 +1,16 @@
 <!DOCTYPE HTML>
-<script type="text/javascript" th:inline="javascript" >
+<script th:inline="javascript" type="text/javascript">
     const host = [[${host}]];
 </script>
 <html lang="en">
 <head>
     <title>Upload</title>
-    <link th:href="@{/styles/main.css}" rel="stylesheet" />
-    <script type="text/javascript" th:src="@{/js/upload.js}"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" th:href="@{/styles/main.css}"/>
+    <script th:src="@{/js/upload.js}" type="text/javascript"></script>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" rel="stylesheet">
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
 </head>
 <body>
 <script>0</script>
@@ -20,13 +20,14 @@
         <div class="col-lg-8 h-75" id="drop_zone">
             <div class="card h-100">
                 <div class="card-body overflow-auto border-dashed m-2">
-                    <div id="drop-container" class="row align-items-center h-100 justify-content-center">
-                        <div id="instructions-column" class="col-lg-6 select-view card-text text-center">
+                    <div class="row align-items-center h-100 justify-content-center" id="drop-container">
+                        <div class="col-lg-6 select-view card-text text-center" id="instructions-column">
                             <p class="lead fs-2 text-center">Drag and drop files <br> or <br></p>
-                            <button id="select-file" type="button" class="btn btn-outline-secondary btn-lg">Select from your computer
+                            <button class="btn btn-outline-secondary btn-lg" id="select-file" type="button">Select from
+                                your computer
                             </button>
                         </div>
-                        <div id="upload-information" class="col-lg-6 d-flex flex-column card-text d-none">
+                        <div class="col-lg-6 d-flex flex-column card-text d-none" id="upload-information">
                             <div class="row">
                                 <div class="col">
                                     <ul class="list-group" id="selected-files">
@@ -35,21 +36,21 @@
                             </div>
                             <div class="row mt-3">
                                 <div class="col">
-                                    <form id="upload-information-form" class="selected-view">
+                                    <form class="selected-view" id="upload-information-form">
                                         <div class="form-group row align-items-center">
-                                            <label for="upload-name" class="col-sm-4">Name</label>
+                                            <label class="col-sm-4" for="upload-name">Name</label>
                                             <div class="col-sm-8">
-                                                <input type="text" class="form-control" id="upload-name"
-                                                       placeholder="this-is-an-example-file.zip">
+                                                <input class="form-control" id="upload-name" placeholder="this-is-an-example-file.zip"
+                                                       type="text">
                                             </div>
                                         </div>
                                         <div class="form-group row align-items-center">
-                                            <label for="download-limit" class="col-sm-4">Expires in</label>
+                                            <label class="col-sm-4" for="download-limit">Expires in</label>
                                             <div class="col-sm-4">
-                                                <input type="number" class="form-control" id="download-limit"
-                                                       placeholder="1">
+                                                <input class="form-control" id="download-limit" placeholder="1"
+                                                       type="number">
                                             </div>
-                                            <label for="download-limit" class="col-sm-4">days</label>
+                                            <label class="col-sm-4" for="download-limit">days</label>
                                         </div>
                                     </form>
                                 </div>
@@ -57,12 +58,14 @@
                         </div>
                     </div>
                 </div>
-                <div id="footer" class="card-footer conditional-display d-none">
-                    <div id="submit-element" class="d-none row align-items-center">
-                        <button id="submit" class="btn btn-primary">Upload now</button>
+                <div class="card-footer conditional-display d-none" id="footer">
+                    <div class="d-none row align-items-center" id="submit-element">
+                        <button class="btn btn-primary" id="submit">Upload now</button>
                     </div>
-                    <div id="progress-element" class="progress d-none">
-                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0"></div>
+                    <div class="progress d-none" id="progress-element">
+                        <div aria-valuemax="100" aria-valuemin="0"
+                             aria-valuenow="0" class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" role="progressbar"
+                             style="width: 0"></div>
                     </div>
                 </div>
             </div>
@@ -70,8 +73,8 @@
     </div>
 
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+<script crossorigin="anonymous"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

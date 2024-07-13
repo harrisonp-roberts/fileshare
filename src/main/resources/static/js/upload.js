@@ -200,11 +200,11 @@ window.addEventListener('DOMContentLoaded', () => {
         setState(states.UPLOAD);
 
         const file = filesToUpload[0];
-        const uploadId = await initiate();
-        await doUpload(uploadId, file);
-        await complete(uploadId);
+        const id = await initiate();
+        await doUpload(id, file);
+        await complete(id);
 
-        window.location.href = host + "/complete/" + uploadId;
+        window.location.href = host + "/complete/" + id;
     }
 
     function getParams() {
@@ -236,17 +236,17 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         }).then(response => response.json());
 
-        return response.uploadId;
+        return response.id;
     }
 
-    async function doUpload(uploadId, file) {
+    async function doUpload(id, file) {
         let pos = 0;
         while (pos < file.size) {
             let slice = file.slice(pos, Math.min(pos + chunkSize, file.size));
             let chunkIndex = Math.floor(pos / chunkSize);
             let formData = buildFormData(slice, chunkIndex);
 
-            await fetch(baseUrl + 'upload/' + uploadId, {
+            await fetch(baseUrl + 'upload/' + id, {
                 method: 'POST',
                 body: formData
             });
@@ -264,9 +264,9 @@ window.addEventListener('DOMContentLoaded', () => {
         return formData;
     }
 
-    async function complete(uploadId) {
-        return await fetch(baseUrl + 'complete/' + uploadId, {
-            method: 'POST'
+    async function complete(id) {
+        return await fetch(baseUrl + 'complete/' + id, {
+            method: 'PUT'
         }).then(response => response.json());
     }
 });

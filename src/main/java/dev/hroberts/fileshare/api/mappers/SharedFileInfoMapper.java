@@ -6,10 +6,10 @@ import dev.hroberts.fileshare.application.domain.SharedFileInfo;
 public class SharedFileInfoMapper {
     public static SharedFileInfoDto MapDomainToDto(SharedFileInfo sharedFileInfo) {
         var sharedFileInfoDto = new SharedFileInfoDto();
-        sharedFileInfoDto.fileId = sharedFileInfo.fileId;
+        sharedFileInfoDto.id = sharedFileInfo.id;
         sharedFileInfoDto.fileName = sharedFileInfo.fileName;
         sharedFileInfoDto.downloadLimit = sharedFileInfo.downloadLimit;
-        sharedFileInfoDto.uploadId = sharedFileInfo.uploadId;
+        sharedFileInfoDto.ready = sharedFileInfo.ready;
         return sharedFileInfoDto;
     }
 }

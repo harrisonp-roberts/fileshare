@@ -17,9 +17,9 @@ public class LocalFileStore implements IFileStore {
     }
 
     @Override
-    public long write(UUID uploadId, String name, InputStream input) {
+    public long write(UUID id, String name, InputStream input) {
         try {
-            var destinationDir = rootFilePath.resolve(uploadId.toString());
+            var destinationDir = rootFilePath.resolve(id.toString());
             var destinationFile = destinationDir
                     .resolve(Paths.get(name))
                     .normalize()
@@ -38,24 +38,24 @@ public class LocalFileStore implements IFileStore {
     }
 
     @Override
-    public void deleteFileByName(UUID uploadId, String fileName) {
-        var file = rootFilePath.resolve(uploadId.toString()).resolve(fileName).toFile();
+    public void deleteFileByName(UUID id, String fileName) {
+        var file = rootFilePath.resolve(id.toString()).resolve(fileName).toFile();
         if (file.exists()) file.delete();
     }
 
     @Override
-    public void copyFileIn(UUID uploadId, String inputFilePath, String fileName) throws IOException {
+    public void copyFileIn(UUID id, String inputFilePath, String fileName) throws IOException {
         Path sourcePath = Path.of(inputFilePath);
-        Path destinationPath = rootFilePath.resolve(uploadId.toString()).resolve(fileName);
+        Path destinationPath = rootFilePath.resolve(id.toString()).resolve(fileName);
 
         if (destinationPath.toFile().exists()) throw new FileAlreadyExistsException("File Already Exists");
         Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     @Override
-    public void copy(UUID uploadId, String source, String target, boolean append) throws IOException {
-        Path sourcePath = rootFilePath.resolve(uploadId.toString()).resolve(source);
-        Path targetPath = rootFilePath.resolve(uploadId.toString()).resolve(target);
+    public void copy(UUID id, String source, String target, boolean append) throws IOException {
+        Path sourcePath = rootFilePath.resolve(id.toString()).resolve(source);
+        Path targetPath = rootFilePath.resolve(id.toString()).resolve(target);
 
         if (!sourcePath.toFile().exists()) throw new FileNotFoundException("Source file not found");
 
@@ -75,9 +75,9 @@ public class LocalFileStore implements IFileStore {
     }
 
     @Override
-    public Path load(UUID uploadId, String fileName) throws FileNotFoundException {
+    public Path load(UUID id, String fileName) throws FileNotFoundException {
         var filePath = rootFilePath
-                .resolve(uploadId.toString())
+                .resolve(id.toString())
                 .resolve(fileName);
         if (filePath.toFile().exists()) {
             return filePath;

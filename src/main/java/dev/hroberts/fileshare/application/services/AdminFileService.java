@@ -28,7 +28,7 @@ public class AdminFileService {
         var fileName = extractFileName(uploadFileByPathDto.filePath);
         var sharedFileInfo = new SharedFileInfo(UUID.randomUUID(), fileName, uploadFileByPathDto.downloadLimit);
 
-        fileStore.copyFileIn(sharedFileInfo.uploadId, uploadFileByPathDto.filePath, sharedFileInfo.fileId);
+        fileStore.copyFileIn(sharedFileInfo.id, uploadFileByPathDto.filePath, sharedFileInfo.fileName);
         return fileInfoRepository.save(sharedFileInfo);
     }
 
@@ -40,7 +40,7 @@ public class AdminFileService {
     public void purgeFiles() {
         var files = fileInfoRepository.findAll();
         files.forEach(sharedFileInfo -> {
-            fileStore.deleteFileByName(UUID.randomUUID(), sharedFileInfo.fileId);
+            fileStore.deleteFileByName(sharedFileInfo.id, sharedFileInfo.fileName);
             fileInfoRepository.delete(sharedFileInfo);
         });
     }

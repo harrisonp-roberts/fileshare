@@ -8,13 +8,13 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 public interface IFileStore {
-    long write(UUID uploadId, String name, InputStream input);
+    long write(UUID id, String name, InputStream input);
 
-    void deleteFileByName(UUID uploadId, String fileName);
+    void deleteFileByName(UUID id, String fileName);
 
-    void copyFileIn(UUID uploadId, String inputFilePath, String fileName) throws FileAlreadyExistsException, IOException;
+    void copyFileIn(UUID id, String inputFilePath, String fileName) throws IOException;
 
-    void copy(UUID uploadId, String source, String target, boolean append) throws IOException;
+    void copy(UUID id, String source, String target, boolean append) throws IOException;
 
-    Path load(UUID uploadId, String fileName) throws FileNotFoundException;
+    Path load(UUID id, String fileName) throws FileNotFoundException;
 }

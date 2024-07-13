@@ -11,9 +11,9 @@ import java.util.UUID;
 
 @Controller
 public class DownloadView {
-    @Value("${host}") String host;
-
     private final UserFileService userFileService;
+    @Value("${host}")
+    String host;
 
     public DownloadView(UserFileService userFileService) {
         this.userFileService = userFileService;
