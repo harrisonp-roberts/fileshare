@@ -68,7 +68,7 @@ public class UserFileController {
     @GetMapping(value = "/download/{id}")
     public @ResponseBody ResponseEntity<Resource> download(@PathVariable UUID id) {
         try {
-            var downloadableFile = userFileService.downloadFile(id);
+            var downloadableFile = userFileService.getDownloadableFile(id);
             var response = new PathResource(downloadableFile.filePath);
             var contentLength = response.contentLength();
             var headers = new HttpHeaders();
