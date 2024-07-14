@@ -56,7 +56,7 @@ public class UserFileService {
 
     public SharedFileInfo completeUpload(UUID id) throws ChunkedUploadCompletedException {
         var chunkedFileUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
-        var sharedFileInfo = new SharedFileInfo(id, chunkedFileUpload.name, chunkedFileUpload.downloadLimit);
+        var sharedFileInfo = new SharedFileInfo(id, chunkedFileUpload.name, chunkedFileUpload.size, chunkedFileUpload.downloadLimit);
         fileInfoRepository.save(sharedFileInfo);
         asyncFileService.processChunks(id, chunkedFileUpload);
         return sharedFileInfo;

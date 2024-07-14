@@ -70,13 +70,14 @@ public class UserFileController {
         try {
             var downloadableFile = userFileService.getDownloadableFile(id);
             var response = new PathResource(downloadableFile.filePath);
-            var contentLength = response.contentLength();
             var headers = new HttpHeaders();
-            var mediaType = MediaTypeFactory.getMediaType(response).orElse(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentType(mediaType);
+            headers.setContentType(downloadableFile.mediaType);
             headers.add("Content-Disposition", "attachment; filename=" + downloadableFile.fileName);
 
-            return ResponseEntity.ok().contentLength(contentLength).contentType(MediaType.APPLICATION_OCTET_STREAM).headers(headers).body(response);
+            return ResponseEntity.ok().contentLength(response.contentLength())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .headers(headers)
+                    .body(response);
         } catch (IOException e) {
             return ResponseEntity.notFound().build();
         }

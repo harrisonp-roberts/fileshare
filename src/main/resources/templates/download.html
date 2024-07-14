@@ -34,6 +34,8 @@
                             <ul class="list-group">
                                 <li class="list-group-item d-flex align-items-center">File Name: &nbsp;<span
                                         th:text="${fileInfo.fileName}"></span></li>
+                                <li class="list-group-item d-flex align-items-center">File Size: &nbsp;<span
+                                        th:text="${fileInfo.fileS}"></span></li>
                                 <li class="list-group-item d-flex align-items-center">Download Limit:&nbsp;<span
                                         th:text="${fileInfo.downloadLimit}"></span></li>
                                 <li class="list-group-item d-flex align-items-center">Remaining Downloads:&nbsp;<span
@@ -62,7 +64,6 @@
 </div>
 <script>
     if(!fileInfo.ready) {
-        console.log("File not ready, reloading");
         refresh();
     } else {
         const btn = document.getElementById("download");
@@ -77,7 +78,7 @@
         }
     }
     async function refresh() {
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 5000));
         window.location.reload();
     }
 </script>

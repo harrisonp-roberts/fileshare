@@ -28,6 +28,7 @@ public class UploadView {
     @GetMapping("/complete/{id}")
     public String complete(@PathVariable UUID id, Model model) {
         var fileInfo = userFileService.getFileInfo(id);
+        if(fileInfo == null) return "redirect:/";
         var qrCode = userFileService.generateQrCode(id);
         model.addAttribute("fileInfo", fileInfo);
         model.addAttribute("qrCode", qrCode);

@@ -8,6 +8,7 @@ public class SharedFileInfoMapper {
         var sharedFileInfoDto = new SharedFileInfoDto();
         sharedFileInfoDto.id = sharedFileInfo.id;
         sharedFileInfoDto.fileName = sharedFileInfo.fileName;
+        sharedFileInfoDto.fileSize = sharedFileInfo.fileSize;
         sharedFileInfoDto.downloadLimit = sharedFileInfo.downloadLimit;
         sharedFileInfoDto.ready = sharedFileInfo.ready;
         return sharedFileInfoDto;

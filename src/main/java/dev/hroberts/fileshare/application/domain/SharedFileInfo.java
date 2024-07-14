@@ -13,16 +13,18 @@ public class SharedFileInfo {
     public UUID id;
     public int downloadLimit;
     public int remainingDownloads;
+    public long fileSize;
     public boolean ready;
 
     public SharedFileInfo() {
         id = UUID.randomUUID();
     }
 
-    public SharedFileInfo(UUID id, String fileName, int downloadLimit) {
+    public SharedFileInfo(UUID id, String fileName, long fileSize, int downloadLimit) {
         this.id = id;
         this.fileName = fileName;
         this.downloadLimit = downloadLimit;
+        this.fileSize = fileSize;
         remainingDownloads = downloadLimit;
         ready = false;
     }

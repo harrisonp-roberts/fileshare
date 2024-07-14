@@ -28,6 +28,7 @@ public class DownloadView {
     @GetMapping("/download/{id}")
     public String download(@PathVariable UUID id, Model model) {
         var fileInfo = userFileService.getFileInfo(id);
+        if(fileInfo == null) return "redirect:/";
         model.addAttribute("fileInfo", fileInfo);
         model.addAttribute("host", host);
         return "download";
