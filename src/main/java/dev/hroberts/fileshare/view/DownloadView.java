@@ -1,5 +1,6 @@
 package dev.hroberts.fileshare.view;
 
+import dev.hroberts.fileshare.api.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.application.services.UserFileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -29,7 +30,8 @@ public class DownloadView {
     public String download(@PathVariable UUID id, Model model) {
         var fileInfo = userFileService.getFileInfo(id);
         if(fileInfo == null) return "redirect:/";
-        model.addAttribute("fileInfo", fileInfo);
+        var fileInfoDto = SharedFileInfoMapper.mapToDto(fileInfo);
+        model.addAttribute("fileInfo", fileInfoDto);
         model.addAttribute("host", host);
         return "download";
     }

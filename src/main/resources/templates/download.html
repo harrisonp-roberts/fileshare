@@ -15,7 +15,7 @@
 <body>
 <div class="container">
     <div class="row justify-content-center align-items-center h-75">
-        <div class="col-md-6 h-50">
+        <div class="col-md-6 h-75">
             <div class="card h-100">
                 <div class="card-body">
                     <div th:if="${fileInfo == null}">
@@ -28,19 +28,19 @@
                         <h3 class="card-title">Upload processing</h3>
                         <p><span th:text="${fileInfo.fileName}"></span> is still processing. Check back later.</p>
                     </div>
-                    <div th:if="${fileInfo != null && fileInfo.ready}">
-                        <div th:if="${fileInfo.remainingDownloads > 0}">
+                    <div class="row h-100" th:if="${fileInfo != null && fileInfo.ready}">
+                        <div class="col-md-12 d-flex flex-column card-text h-100" th:if="${fileInfo.remainingDownloads > 0}">
                             <h3 class="card-title">Download file</h3>
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex align-items-center">File Name: &nbsp;<span
+                            <ul class="list-group d-flex flex-column flex-row">
+                                <li class="list-group-item">File Name: &nbsp;<span
                                         th:text="${fileInfo.fileName}"></span></li>
-                                <li class="list-group-item d-flex align-items-center">File Size: &nbsp;<span
-                                        th:text="${fileInfo.fileS}"></span></li>
-                                <li class="list-group-item d-flex align-items-center">Download Limit:&nbsp;<span
+                                <li class="list-group-item">File Size: &nbsp;<span
+                                        th:text="${fileInfo.fileSize}"></span></li>
+                                <li class="list-group-item">Download Limit:&nbsp;<span
                                         th:text="${fileInfo.downloadLimit}"></span></li>
-                                <li class="list-group-item d-flex align-items-center">Remaining Downloads:&nbsp;<span
+                                <li class="list-group-item">Remaining Downloads:&nbsp;<span
                                         th:text="${fileInfo.remainingDownloads}"></span></li>
-                                <li class="list-group-item d-flex align-items-center">
+                                <li class="list-group-item">
                                     <div class="row">
                                         <button class="btn btn-secondary" id="download">Download now</button>
                                     </div>

@@ -4,7 +4,7 @@ import dev.hroberts.fileshare.api.dtos.ChunkedFileUploadDto;
 import dev.hroberts.fileshare.application.domain.ChunkedFileUpload;
 
 public class ChunkedFileUploadMapper {
-    public static ChunkedFileUploadDto map(ChunkedFileUpload chunkedFileUpload) {
+    public static ChunkedFileUploadDto mapToDto     (ChunkedFileUpload chunkedFileUpload) {
         var chunkedFileUploadDto = new ChunkedFileUploadDto();
         chunkedFileUploadDto.id = chunkedFileUpload.id;
         chunkedFileUploadDto.name = chunkedFileUpload.name;

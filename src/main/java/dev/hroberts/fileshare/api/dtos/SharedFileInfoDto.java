@@ -5,7 +5,8 @@ import java.util.UUID;
 public class SharedFileInfoDto {
     public String fileName;
     public UUID id;
-    public long fileSize;
+    public String fileSize;
     public int downloadLimit;
+    public int remainingDownloads;
     public boolean ready;
 }

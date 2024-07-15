@@ -12,7 +12,6 @@ import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +31,7 @@ public class UserFileController {
     @PostMapping("/initiate-multipart")
     public @ResponseBody ResponseEntity<ChunkedFileUploadDto> initiateMultipartUpload(@RequestBody ChunkedFileUploadDto request) {
         var chunkedFileUpload = userFileService.initiateChunkedUpload(request.name, request.size, request.downloadLimit);
-        return ResponseEntity.ok(ChunkedFileUploadMapper.map(chunkedFileUpload));
+        return ResponseEntity.ok(ChunkedFileUploadMapper.mapToDto(chunkedFileUpload));
     }
 
     @PostMapping("/upload/{id}")
@@ -53,7 +52,7 @@ public class UserFileController {
     public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID id) {
         try {
             var response = userFileService.completeUpload(id);
-            return ResponseEntity.ok(SharedFileInfoMapper.MapDomainToDto(response));
+            return ResponseEntity.ok(SharedFileInfoMapper.mapToDto(response));
         } catch (ChunkedUploadCompletedException e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -62,7 +61,7 @@ public class UserFileController {
     @GetMapping("/info/{id}")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> getInfo(@PathVariable UUID id) {
         var response = userFileService.getFileInfo(id);
-        return ResponseEntity.ok(SharedFileInfoMapper.MapDomainToDto(response));
+        return ResponseEntity.ok(SharedFileInfoMapper.mapToDto(response));
     }
 
     @GetMapping(value = "/download/{id}")
