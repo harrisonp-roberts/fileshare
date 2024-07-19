@@ -178,9 +178,9 @@ window.addEventListener('DOMContentLoaded', () => {
         selectedFiles.append(listItem);
 
         //if user hasn't set a name, and adding first file to list
-        if (!dirty && selectedFiles.children.length === 1) {
-            document.getElementById('upload-name').value = filename;
-        }
+        // if (!dirty && selectedFiles.children.length === 1) {
+        //     document.getElementById('upload-name').value = filename;
+        // }
     }
 
     function removeFileFromUpload(filename) {
@@ -213,10 +213,7 @@ window.addEventListener('DOMContentLoaded', () => {
             fileName: filesToUpload[0].name
         };
 
-        if (dirty) {
-            params.fileName = document.getElementById('upload-name').value;
-            params.downloadLimit = document.getElementById('download-limit').value;
-        }
+        params.downloadLimit = document.getElementById('download-limit').value;
         return params;
     }
 
