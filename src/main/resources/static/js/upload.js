@@ -213,7 +213,9 @@ window.addEventListener('DOMContentLoaded', () => {
             fileName: filesToUpload[0].name
         };
 
-        params.downloadLimit = document.getElementById('download-limit').value;
+        if(document.getElementById('download-limit').value > 0)
+            params.downloadLimit = document.getElementById('download-limit').value;
+
         return params;
     }
 
