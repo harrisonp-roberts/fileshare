@@ -9,7 +9,9 @@ import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
 import dev.hroberts.fileshare.models.exceptions.ChunkSizeOutOfBoundsException;
 import dev.hroberts.fileshare.services.exceptions.ChunkedUploadCompletedException;
 import dev.hroberts.fileshare.services.UserFileService;
+import dev.hroberts.fileshare.web.resources.DeletableFileSystemResource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -70,7 +72,7 @@ public class UserFileController {
     public @ResponseBody ResponseEntity<Resource> download(@PathVariable UUID id, HttpServletResponse servletResponse) {
         try {
             var downloadableFile = userFileService.getDownloadableFile(id);
-            var response = new PathResource(downloadableFile.filePath);
+            var response = new DeletableFileSystemResource(downloadableFile.filePath, downloadableFile.shouldDelete);
             var headers = new HttpHeaders();
             headers.setContentType(downloadableFile.mediaType);
             headers.add("Content-Disposition", "attachment; filename=" + downloadableFile.fileName);

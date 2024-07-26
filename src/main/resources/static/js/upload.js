@@ -209,7 +209,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function getParams() {
         let params = {
-            downloadLimit: 1,
+            downloadLimit: -1,
             fileName: filesToUpload[0].name
         };
 

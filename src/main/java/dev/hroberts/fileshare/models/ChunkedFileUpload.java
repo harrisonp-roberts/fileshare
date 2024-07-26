@@ -31,7 +31,7 @@ public class ChunkedFileUpload {
         this.currentSize = 0L;
         this.size = size;
 
-        if(this.downloadLimit < 1) {
+        if(downloadLimit < 1) {
             this.downloadLimit = -1;
         } else {
             this.downloadLimit = downloadLimit;

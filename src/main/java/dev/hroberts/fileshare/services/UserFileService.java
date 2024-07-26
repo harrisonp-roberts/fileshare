@@ -69,14 +69,15 @@ public class UserFileService {
         var fileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
         var filePath = localFileStore.load(id, fileInfo.fileName);
         fileInfo.download();
+        var shouldDelete = fileInfo.remainingDownloads == 0;
 
-        if(fileInfo.remainingDownloads == 0) {
+        if(shouldDelete) {
             fileInfoRepository.delete(fileInfo);
         } else {
             fileInfoRepository.save(fileInfo);
         }
 
-        return new DownloadableFile(fileInfo.fileName, filePath);
+        return new DownloadableFile(fileInfo.fileName, filePath, shouldDelete);
     }
 
     public String generateQrCode(UUID id) {
