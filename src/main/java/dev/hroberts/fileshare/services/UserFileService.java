@@ -6,11 +6,10 @@ import dev.hroberts.fileshare.models.SharedFileInfo;
 import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
 import dev.hroberts.fileshare.models.exceptions.ChunkSizeOutOfBoundsException;
 import dev.hroberts.fileshare.models.exceptions.DomainException;
-import dev.hroberts.fileshare.services.exceptions.ChunkedUploadCompletedException;
+import dev.hroberts.fileshare.persistence.files.IFileStore;
 import dev.hroberts.fileshare.persistence.repositories.ChunkedFileUploadRepository;
 import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
-import dev.hroberts.fileshare.persistence.files.IFileStore;
-import jakarta.servlet.http.HttpServletResponse;
+import dev.hroberts.fileshare.services.exceptions.ChunkedUploadCompletedException;
 import net.glxn.qrgen.core.image.ImageType;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,16 +43,18 @@ public class UserFileService {
     }
 
     public void saveChunk(UUID id, long chunkSize, int chunkIndex, InputStream input) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
-        var chunkedUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
-        var chunk = chunkedUpload.addChunk(chunkSize, chunkIndex);
+        try {
+            var chunkedUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
+            var chunk = chunkedUpload.addChunk(chunkSize, chunkIndex);
 
-        var actualSize = localFileStore.write(id, chunk.name, input);
-        if (actualSize != chunkSize) {
-            localFileStore.deleteFileByName(id, chunk.name);
-            throw new ChunkSizeOutOfBoundsException();
+            var actualSize = localFileStore.write(id, chunk.name, input);
+            if (actualSize != chunkSize) {
+                localFileStore.deleteFileByName(id, chunk.name);
+                throw new ChunkSizeOutOfBoundsException();
+            }
+        } catch (Exception ex) {
+            throw ex;
         }
-
-        chunkedUploadRepository.save(chunkedUpload);
     }
 
     public SharedFileInfo completeUpload(UUID id) throws ChunkedUploadCompletedException {
@@ -62,7 +63,6 @@ public class UserFileService {
         fileInfoRepository.save(sharedFileInfo);
         asyncFileService.processChunks(id, chunkedFileUpload);
         return sharedFileInfo;
-
     }
 
     public DownloadableFile getDownloadableFile(UUID id) throws FileNotFoundException {
@@ -71,7 +71,7 @@ public class UserFileService {
         fileInfo.download();
         var shouldDelete = fileInfo.remainingDownloads == 0;
 
-        if(shouldDelete) {
+        if (shouldDelete) {
             fileInfoRepository.delete(fileInfo);
         } else {
             fileInfoRepository.save(fileInfo);

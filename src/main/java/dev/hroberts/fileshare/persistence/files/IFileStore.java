@@ -4,10 +4,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.UUID;
 
 public interface IFileStore {
     long write(UUID id, String name, InputStream input);
+
+    List<Path> listFiles(UUID id);
 
     void deleteFileByName(UUID id, String fileName);
 

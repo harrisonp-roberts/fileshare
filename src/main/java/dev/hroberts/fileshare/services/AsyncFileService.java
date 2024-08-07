@@ -28,11 +28,13 @@ public class AsyncFileService {
     @Async
     public void processChunks(UUID id, ChunkedFileUpload chunkedFileUpload) throws ChunkedUploadCompletedException {
         try {
-            for (MultipartChunk chunk : chunkedFileUpload.listChunks()) {
-                localFileStore.copy(id, chunk.name, chunkedFileUpload.name, true);
+            //todo too much path conversion shit
+            var files = localFileStore.listFiles(id);
+            for (var chunk : localFileStore.listFiles(id)) {
+                localFileStore.copy(id, chunk.getFileName().toString(), chunkedFileUpload.name, true);
             }
 
-            chunkedFileUpload.listChunks().forEach(chunk -> localFileStore.deleteFileByName(id, chunk.name));
+            files.forEach(chunk -> localFileStore.deleteFileByName(id, chunk.getFileName().toString()));
             chunkedUploadRepository.delete(chunkedFileUpload);
 
             var sharedFileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class LocalFileStore implements IFileStore {
@@ -38,6 +38,16 @@ public class LocalFileStore implements IFileStore {
     }
 
     @Override
+    public List<Path> listFiles(UUID id) {
+        var destinationDir = rootFilePath.resolve(id.toString());
+        try (var stream = Files.list(destinationDir)){
+            return stream.filter(f -> !Files.isDirectory(f)).sorted().toList();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    @Override
     public void deleteFileByName(UUID id, String fileName) {
         var file = rootFilePath.resolve(id.toString()).resolve(fileName).toFile();
         if (file.exists()) file.delete();
@@ -51,6 +61,8 @@ public class LocalFileStore implements IFileStore {
         if (destinationPath.toFile().exists()) throw new FileAlreadyExistsException("File Already Exists");
         Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
     }
+
+
 
     @Override
     public void copy(UUID id, String source, String target, boolean append) throws IOException {
