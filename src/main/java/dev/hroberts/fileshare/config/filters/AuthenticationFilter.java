@@ -18,8 +18,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String requestApiKey = request.getHeader(API_HEADER);
-        //todo allow access to view in better way
         filterChain.doFilter(request, response);
 
 //        if (apiKey.equals(requestApiKey) || request.getRequestURI().startsWith("/files")) {
