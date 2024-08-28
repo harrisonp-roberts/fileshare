@@ -68,16 +68,16 @@ public class UserFileService {
     public DownloadableFile getDownloadableFile(UUID id) throws FileNotFoundException {
         var fileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
         var filePath = localFileStore.load(id, fileInfo.fileName);
-        fileInfo.download();
-        var shouldDelete = fileInfo.remainingDownloads == 0;
+       // fileInfo.download();
+//        var shouldDelete = fileInfo.remainingDownloads == 0;
+//
+//        if (shouldDelete) {
+//            fileInfoRepository.delete(fileInfo);
+//        } else {
+//            fileInfoRepository.save(fileInfo);
+//        }
 
-        if (shouldDelete) {
-            fileInfoRepository.delete(fileInfo);
-        } else {
-            fileInfoRepository.save(fileInfo);
-        }
-
-        return new DownloadableFile(fileInfo.fileName, filePath, shouldDelete);
+        return new DownloadableFile(fileInfo.fileName, filePath, false);
     }
 
     public String generateQrCode(UUID id) {
