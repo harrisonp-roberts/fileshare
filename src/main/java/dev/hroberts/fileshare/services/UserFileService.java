@@ -4,8 +4,8 @@ import dev.hroberts.fileshare.models.ChunkedFileUpload;
 import dev.hroberts.fileshare.models.DownloadableFile;
 import dev.hroberts.fileshare.models.SharedFileInfo;
 import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
-import dev.hroberts.fileshare.models.exceptions.ChunkSizeOutOfBoundsException;
 import dev.hroberts.fileshare.models.exceptions.DomainException;
+import dev.hroberts.fileshare.models.exceptions.FailedToSaveChunkException;
 import dev.hroberts.fileshare.persistence.files.IFileStore;
 import dev.hroberts.fileshare.persistence.repositories.ChunkedFileUploadRepository;
 import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.UUID;
@@ -36,30 +37,26 @@ public class UserFileService {
         this.asyncFileService = asyncFileService;
     }
 
-    public ChunkedFileUpload initiateChunkedUpload(String name, long size, int downloadLimit) throws DomainException {
-        var chunkedFileUpload = new ChunkedFileUpload(name, size, downloadLimit);
+    public ChunkedFileUpload initiateChunkedUpload(String name, int downloadLimit) throws DomainException {
+        var chunkedFileUpload = new ChunkedFileUpload(name, downloadLimit);
         chunkedUploadRepository.save(chunkedFileUpload);
         return chunkedFileUpload;
     }
 
-    public void saveChunk(UUID id, long chunkSize, int chunkIndex, InputStream input) throws ChunkAlreadyExistsException, ChunkSizeOutOfBoundsException {
+    public void saveChunk(UUID id, int chunkIndex, String hash, InputStream input) throws DomainException {
+        var chunkedUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
+        if (chunkedUpload.completing) throw new ChunkAlreadyExistsException();
+        var chunkName = String.format("%s.%s", chunkedUpload.name, chunkIndex);
         try {
-            var chunkedUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
-            var chunk = chunkedUpload.addChunk(chunkSize, chunkIndex);
-
-            var actualSize = localFileStore.write(id, chunk.name, input);
-            if (actualSize != chunkSize) {
-                localFileStore.deleteFileByName(id, chunk.name);
-                throw new ChunkSizeOutOfBoundsException();
-            }
-        } catch (Exception ex) {
-            throw ex;
+            localFileStore.write(id, chunkName, input);
+        } catch (IOException ex) {
+            throw new FailedToSaveChunkException();
         }
     }
 
     public SharedFileInfo completeUpload(UUID id) throws ChunkedUploadCompletedException {
         var chunkedFileUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
-        var sharedFileInfo = new SharedFileInfo(id, chunkedFileUpload.name, chunkedFileUpload.size, chunkedFileUpload.downloadLimit);
+        var sharedFileInfo = new SharedFileInfo(id, chunkedFileUpload.name, chunkedFileUpload.downloadLimit, chunkedFileUpload.startTime);
         fileInfoRepository.save(sharedFileInfo);
         asyncFileService.processChunks(id, chunkedFileUpload);
         return sharedFileInfo;

@@ -1,5 +1,7 @@
 package dev.hroberts.fileshare.persistence.files;
 
+import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
+import dev.hroberts.fileshare.models.exceptions.DomainException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,24 +19,24 @@ public class LocalFileStore implements IFileStore {
     }
 
     @Override
-    public long write(UUID id, String name, InputStream input) {
-        try {
-            var destinationDir = rootFilePath.resolve(id.toString());
-            var destinationFile = destinationDir
-                    .resolve(Paths.get(name))
-                    .normalize()
-                    .toAbsolutePath();
+    public long write(UUID id, String name, InputStream input) throws DomainException, IOException {
+        var destinationDir = rootFilePath.resolve(id.toString());
+        var destinationFile = destinationDir
+                .resolve(Paths.get(name))
+                .normalize()
+                .toAbsolutePath();
 
-            if (!destinationFile.toFile().exists()) {
-                Files.createDirectories(destinationDir);
-                Files.createFile(destinationFile);
-            }
+        if (Files.exists(destinationFile)) throw new ChunkAlreadyExistsException();
 
-            Files.write(destinationFile, input.readAllBytes(), StandardOpenOption.APPEND);
-            return Files.size(destinationFile);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+
+        if (!destinationDir.toFile().exists()) {
+            Files.createDirectories(destinationDir);
         }
+
+        Files.createFile(destinationFile);
+        Files.write(destinationFile, input.readAllBytes());
+        return Files.size(destinationFile);
+
     }
 
     @Override
@@ -61,8 +63,6 @@ public class LocalFileStore implements IFileStore {
         if (destinationPath.toFile().exists()) throw new FileAlreadyExistsException("File Already Exists");
         Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
     }
-
-
 
     @Override
     public void copy(UUID id, String source, String target, boolean append) throws IOException {

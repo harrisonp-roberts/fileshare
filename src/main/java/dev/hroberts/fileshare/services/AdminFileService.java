@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,7 +28,7 @@ public class AdminFileService {
     @Deprecated
     public SharedFileInfo uploadByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
         var fileName = extractFileName(uploadFileByPathDto.filePath);
-        var sharedFileInfo = new SharedFileInfo(UUID.randomUUID(),fileName, 0L, uploadFileByPathDto.downloadLimit);
+        var sharedFileInfo = new SharedFileInfo(UUID.randomUUID(),fileName, uploadFileByPathDto.downloadLimit, LocalDateTime.now(ZoneId.of("UTC")));
 
         fileStore.copyFileIn(sharedFileInfo.id, uploadFileByPathDto.filePath, sharedFileInfo.fileName);
         return fileInfoRepository.save(sharedFileInfo);

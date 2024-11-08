@@ -6,6 +6,7 @@ TODO:
 - Takes a long time to complete large file upload (to put pieces together).
 -   Maybe look at concatenating the parts as they get uploaded? Or show user it's completed earlier or something
  */
+import md5 from './md5.min.js';
 
 const states = {
     SELECT: "select",
@@ -221,13 +222,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     async function initiate() {
         let params = getParams();
-        let size = filesToUpload[0].size;
 
         let response = await fetch(baseUrl + 'initiate-multipart', {
             method: 'POST',
             body: JSON.stringify({
                 name: params.fileName,
-                size: size,
                 downloadLimit: params.downloadLimit
             }),
             headers: {
@@ -242,8 +241,10 @@ window.addEventListener('DOMContentLoaded', () => {
         let pos = 0;
         while (pos < file.size) {
             let slice = file.slice(pos, Math.min(pos + chunkSize, file.size));
+            md5(slice);
+            let hash = md5.create();
             let chunkIndex = Math.floor(pos / chunkSize);
-            let formData = buildFormData(slice, chunkIndex);
+            let formData = buildFormData(slice, chunkIndex, hash);
 
             await fetch(baseUrl + 'upload/' + id, {
                 method: 'POST',
@@ -255,11 +256,11 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function buildFormData(slice, chunkIndex) {
+    function buildFormData(slice, chunkIndex, hash) {
         const formData = new FormData();
         formData.append('file', slice);
+        formData.append('hash', hash);
         formData.append('chunkIndex', chunkIndex);
-        formData.append('size', slice.size);
         return formData;
     }
 

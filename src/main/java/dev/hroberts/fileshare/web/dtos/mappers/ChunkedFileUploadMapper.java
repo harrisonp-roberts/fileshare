@@ -9,7 +9,7 @@ public class ChunkedFileUploadMapper {
         chunkedFileUploadDto.id = chunkedFileUpload.id;
         chunkedFileUploadDto.name = chunkedFileUpload.name;
         chunkedFileUploadDto.downloadLimit = chunkedFileUpload.downloadLimit;
-        chunkedFileUploadDto.size = chunkedFileUpload.size;
+        chunkedFileUploadDto.startTime = chunkedFileUpload.startTime;
         return chunkedFileUploadDto;
     }
 }

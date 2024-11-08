@@ -14,6 +14,8 @@ public class SharedFileInfoMapper {
         sharedFileInfoDto.remainingDownloads = sharedFileInfo.remainingDownloads;
         sharedFileInfoDto.downloadLimit = sharedFileInfo.downloadLimit;
         sharedFileInfoDto.ready = sharedFileInfo.ready;
+        sharedFileInfoDto.uploadStart = sharedFileInfo.uploadStart;
+        sharedFileInfoDto.uploadEnd = sharedFileInfo.uploadEnd;
         return sharedFileInfoDto;
     }
 

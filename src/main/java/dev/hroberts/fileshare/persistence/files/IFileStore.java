@@ -1,5 +1,7 @@
 package dev.hroberts.fileshare.persistence.files;
 
+import dev.hroberts.fileshare.models.exceptions.DomainException;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IFileStore {
-    long write(UUID id, String name, InputStream input);
+    long write(UUID id, String name, InputStream input) throws IOException, DomainException;
 
     List<Path> listFiles(UUID id);
 

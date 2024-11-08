@@ -6,13 +6,10 @@ import dev.hroberts.fileshare.web.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.web.dtos.mappers.ChunkedFileUploadMapper;
 import dev.hroberts.fileshare.web.dtos.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
-import dev.hroberts.fileshare.models.exceptions.ChunkSizeOutOfBoundsException;
 import dev.hroberts.fileshare.services.exceptions.ChunkedUploadCompletedException;
 import dev.hroberts.fileshare.services.UserFileService;
 import dev.hroberts.fileshare.web.resources.DeletableFileSystemResource;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,20 +31,18 @@ public class UserFileController {
 
     @PostMapping("/initiate-multipart")
     public @ResponseBody ResponseEntity<ChunkedFileUploadDto> initiateMultipartUpload(@RequestBody ChunkedFileUploadDto request) throws DomainException {
-        var chunkedFileUpload = userFileService.initiateChunkedUpload(request.name, request.size, request.downloadLimit);
+        var chunkedFileUpload = userFileService.initiateChunkedUpload(request.name, request.downloadLimit);
         return ResponseEntity.ok(ChunkedFileUploadMapper.mapToDto(chunkedFileUpload));
     }
 
     @PostMapping("/upload/{id}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID id, @RequestParam MultipartFile file, @RequestParam int chunkIndex, @RequestParam long size) {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID id, @RequestParam String hash, @RequestParam MultipartFile file, @RequestParam int chunkIndex) {
         try {
-            userFileService.saveChunk(id, size, chunkIndex, file.getInputStream());
+            userFileService.saveChunk(id, chunkIndex, hash, file.getInputStream());
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
-        } catch (ChunkAlreadyExistsException e) {
+        } catch (DomainException e) {
             return ResponseEntity.badRequest().build();
-        } catch (ChunkSizeOutOfBoundsException e) {
-            throw new RuntimeException(e);
         }
         return ResponseEntity.ok().build();
     }

@@ -28,7 +28,6 @@ public class AsyncFileService {
     @Async
     public void processChunks(UUID id, ChunkedFileUpload chunkedFileUpload) throws ChunkedUploadCompletedException {
         try {
-            //todo too much path conversion shit
             var files = localFileStore.listFiles(id);
             for (var chunk : localFileStore.listFiles(id)) {
                 localFileStore.copy(id, chunk.getFileName().toString(), chunkedFileUpload.name, true);
@@ -38,7 +37,10 @@ public class AsyncFileService {
             chunkedUploadRepository.delete(chunkedFileUpload);
 
             var sharedFileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
+            var completedFile = localFileStore.load(id, sharedFileInfo.fileName);
+
             sharedFileInfo.ready = true;
+            sharedFileInfo.fileSize = completedFile.toFile().length();
 
             fileInfoRepository.save(sharedFileInfo);
         } catch (IOException ex) {
