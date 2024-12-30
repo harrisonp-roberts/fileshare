@@ -4,6 +4,7 @@ import dev.hroberts.fileshare.web.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.models.SharedFileInfo;
 
 import java.text.DecimalFormat;
+import java.time.ZoneOffset;
 
 public class SharedFileInfoMapper {
     public static SharedFileInfoDto mapToDto(SharedFileInfo sharedFileInfo) {
@@ -14,8 +15,8 @@ public class SharedFileInfoMapper {
         sharedFileInfoDto.remainingDownloads = sharedFileInfo.remainingDownloads;
         sharedFileInfoDto.downloadLimit = sharedFileInfo.downloadLimit;
         sharedFileInfoDto.ready = sharedFileInfo.ready;
-        sharedFileInfoDto.uploadStart = sharedFileInfo.uploadStart;
-        sharedFileInfoDto.uploadEnd = sharedFileInfo.uploadEnd;
+        sharedFileInfoDto.uploadStart = sharedFileInfo.uploadStart.toInstant(ZoneOffset.UTC).toEpochMilli();
+        sharedFileInfoDto.uploadEnd = sharedFileInfo.uploadEnd.toInstant(ZoneOffset.UTC).toEpochMilli();
         return sharedFileInfoDto;
     }
 

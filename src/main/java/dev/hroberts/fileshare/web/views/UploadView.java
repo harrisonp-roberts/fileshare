@@ -22,6 +22,7 @@ public class UploadView {
 
     @GetMapping("/")
     public String index(Model model) {
+        System.out.println("Setting host: " + host);
         model.addAttribute("host", host);
         return "upload";
     }

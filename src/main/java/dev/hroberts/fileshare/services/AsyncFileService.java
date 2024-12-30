@@ -1,12 +1,10 @@
 package dev.hroberts.fileshare.services;
 
 import dev.hroberts.fileshare.models.ChunkedFileUpload;
-import dev.hroberts.fileshare.models.MultipartChunk;
-import dev.hroberts.fileshare.services.exceptions.ChunkedUploadCompletedException;
 import dev.hroberts.fileshare.persistence.repositories.ChunkedFileUploadRepository;
 import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
 import dev.hroberts.fileshare.persistence.files.IFileStore;
-import jakarta.servlet.http.HttpServletResponse;
+import dev.hroberts.fileshare.services.exceptions.UploadAlreadyCompletedException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +24,7 @@ public class AsyncFileService {
     }
 
     @Async
-    public void processChunks(UUID id, ChunkedFileUpload chunkedFileUpload) throws ChunkedUploadCompletedException {
+    public void processChunks(UUID id, ChunkedFileUpload chunkedFileUpload) throws IOException {
         try {
             var files = localFileStore.listFiles(id);
             for (var chunk : localFileStore.listFiles(id)) {
@@ -45,7 +43,7 @@ public class AsyncFileService {
             fileInfoRepository.save(sharedFileInfo);
         } catch (IOException ex) {
             localFileStore.deleteFileByName(id, chunkedFileUpload.name);
-            throw new ChunkedUploadCompletedException();
+            throw ex;
         }
     }
 }

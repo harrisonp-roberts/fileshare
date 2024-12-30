@@ -10,6 +10,6 @@ public class SharedFileInfoDto {
     public int downloadLimit;
     public int remainingDownloads;
     public boolean ready;
-    public LocalDateTime uploadStart;
-    public LocalDateTime uploadEnd;
+    public long uploadStart;
+    public long uploadEnd;
 }

@@ -1,7 +1,5 @@
 package dev.hroberts.fileshare.persistence.files;
 
-import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
-import dev.hroberts.fileshare.models.exceptions.DomainException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,24 +17,24 @@ public class LocalFileStore implements IFileStore {
     }
 
     @Override
-    public long write(UUID id, String name, InputStream input) throws DomainException, IOException {
+    public long write(UUID id, String name, InputStream input) throws IOException {
         var destinationDir = rootFilePath.resolve(id.toString());
         var destinationFile = destinationDir
                 .resolve(Paths.get(name))
                 .normalize()
                 .toAbsolutePath();
 
-        if (Files.exists(destinationFile)) throw new ChunkAlreadyExistsException();
-
-
         if (!destinationDir.toFile().exists()) {
             Files.createDirectories(destinationDir);
         }
 
+        if (Files.exists(destinationFile)) {
+            Files.delete(destinationFile);
+        }
+
         Files.createFile(destinationFile);
         Files.write(destinationFile, input.readAllBytes());
-        return Files.size(destinationFile);
-
+        return destinationFile.toFile().length();
     }
 
     @Override

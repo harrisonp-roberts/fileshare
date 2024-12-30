@@ -6,7 +6,6 @@ TODO:
 - Takes a long time to complete large file upload (to put pieces together).
 -   Maybe look at concatenating the parts as they get uploaded? Or show user it's completed earlier or something
  */
-import md5 from './md5.min.js';
 
 const states = {
     SELECT: "select",
@@ -241,8 +240,10 @@ window.addEventListener('DOMContentLoaded', () => {
         let pos = 0;
         while (pos < file.size) {
             let slice = file.slice(pos, Math.min(pos + chunkSize, file.size));
-            md5(slice);
+            console.log("beginning hash")
+            console.log("created hash object")
             let hash = md5.create();
+            console.log("hash: ", hash)
             let chunkIndex = Math.floor(pos / chunkSize);
             let formData = buildFormData(slice, chunkIndex, hash);
 
@@ -259,7 +260,7 @@ window.addEventListener('DOMContentLoaded', () => {
     function buildFormData(slice, chunkIndex, hash) {
         const formData = new FormData();
         formData.append('file', slice);
-        formData.append('hash', hash);
+        // formData.append('hash', hash);
         formData.append('chunkIndex', chunkIndex);
         return formData;
     }

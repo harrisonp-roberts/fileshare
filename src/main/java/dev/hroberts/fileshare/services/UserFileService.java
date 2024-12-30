@@ -3,13 +3,13 @@ package dev.hroberts.fileshare.services;
 import dev.hroberts.fileshare.models.ChunkedFileUpload;
 import dev.hroberts.fileshare.models.DownloadableFile;
 import dev.hroberts.fileshare.models.SharedFileInfo;
-import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
+import dev.hroberts.fileshare.services.exceptions.UploadAlreadyCompletedException;
 import dev.hroberts.fileshare.models.exceptions.DomainException;
 import dev.hroberts.fileshare.models.exceptions.FailedToSaveChunkException;
 import dev.hroberts.fileshare.persistence.files.IFileStore;
 import dev.hroberts.fileshare.persistence.repositories.ChunkedFileUploadRepository;
 import dev.hroberts.fileshare.persistence.repositories.FileInfoRepository;
-import dev.hroberts.fileshare.services.exceptions.ChunkedUploadCompletedException;
+import dev.hroberts.fileshare.services.exceptions.InvalidHashAlgorithmException;
 import net.glxn.qrgen.core.image.ImageType;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,19 +43,28 @@ public class UserFileService {
         return chunkedFileUpload;
     }
 
-    public void saveChunk(UUID id, int chunkIndex, String hash, InputStream input) throws DomainException {
+    public void saveChunk(UUID id, int chunkIndex, String hash, String hashAlgorithm, InputStream input) throws DomainException, InvalidHashAlgorithmException, UploadAlreadyCompletedException {
+        if((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null)) throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
         var chunkedUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
-        if (chunkedUpload.completing) throw new ChunkAlreadyExistsException();
+        if (chunkedUpload.completing) throw new UploadAlreadyCompletedException("Chunks cannot be added to a completed upload");
+
         var chunkName = String.format("%s.%s", chunkedUpload.name, chunkIndex);
+
         try {
             localFileStore.write(id, chunkName, input);
         } catch (IOException ex) {
             throw new FailedToSaveChunkException();
         }
+
+        if(hash != null) {
+            validateFileHash(chunkName, hash);
+        }
     }
 
-    public SharedFileInfo completeUpload(UUID id) throws ChunkedUploadCompletedException {
+    public SharedFileInfo completeUpload(UUID id, String hash, String hashAlgorithm) throws UploadAlreadyCompletedException, InvalidHashAlgorithmException, IOException {
+        if((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null)) throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
         var chunkedFileUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
+        if(chunkedFileUpload.completing) throw new UploadAlreadyCompletedException("Upload has already been completed");
         var sharedFileInfo = new SharedFileInfo(id, chunkedFileUpload.name, chunkedFileUpload.downloadLimit, chunkedFileUpload.startTime);
         fileInfoRepository.save(sharedFileInfo);
         asyncFileService.processChunks(id, chunkedFileUpload);
@@ -87,4 +96,6 @@ public class UserFileService {
     public SharedFileInfo getFileInfo(UUID id) {
         return fileInfoRepository.findById(id.toString()).orElse(null);
     }
+
+    private void validateFileHash(String filename, String expectedHash) {}
 }

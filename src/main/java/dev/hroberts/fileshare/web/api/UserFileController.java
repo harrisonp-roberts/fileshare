@@ -1,12 +1,14 @@
 package dev.hroberts.fileshare.web.api;
 
+import dev.hroberts.fileshare.models.SharedFileInfo;
 import dev.hroberts.fileshare.models.exceptions.DomainException;
+import dev.hroberts.fileshare.services.exceptions.InvalidHashAlgorithmException;
+import dev.hroberts.fileshare.services.exceptions.UploadAlreadyCompletedException;
 import dev.hroberts.fileshare.web.dtos.ChunkedFileUploadDto;
+import dev.hroberts.fileshare.web.dtos.CompleteChunkedUploadDto;
 import dev.hroberts.fileshare.web.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.web.dtos.mappers.ChunkedFileUploadMapper;
 import dev.hroberts.fileshare.web.dtos.mappers.SharedFileInfoMapper;
-import dev.hroberts.fileshare.models.exceptions.ChunkAlreadyExistsException;
-import dev.hroberts.fileshare.services.exceptions.ChunkedUploadCompletedException;
 import dev.hroberts.fileshare.services.UserFileService;
 import dev.hroberts.fileshare.web.resources.DeletableFileSystemResource;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,23 +38,29 @@ public class UserFileController {
     }
 
     @PostMapping("/upload/{id}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID id, @RequestParam String hash, @RequestParam MultipartFile file, @RequestParam int chunkIndex) {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID id, @RequestParam(required = false) String hash, @RequestParam(required = false) String hashAlgorithm, @RequestParam MultipartFile file, @RequestParam int chunkIndex) throws DomainException, InvalidHashAlgorithmException, UploadAlreadyCompletedException {
         try {
-            userFileService.saveChunk(id, chunkIndex, hash, file.getInputStream());
+            userFileService.saveChunk(id, chunkIndex, hash, hashAlgorithm, file.getInputStream());
+            return ResponseEntity.ok().build();
+
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
-        } catch (DomainException e) {
-            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/complete/{id}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID id) {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID id, @RequestBody(required = false) CompleteChunkedUploadDto request) throws InvalidHashAlgorithmException, UploadAlreadyCompletedException {
         try {
-            var response = userFileService.completeUpload(id);
+            String hash = null;
+            String hashAlgorithm = null;
+            if (request != null) {
+                hash = request.hash;
+                hashAlgorithm = request.hashAlgorithm;
+            }
+
+            var response = userFileService.completeUpload(id, hash, hashAlgorithm);
             return ResponseEntity.ok(SharedFileInfoMapper.mapToDto(response));
-        } catch (ChunkedUploadCompletedException e) {
+        } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -77,7 +85,7 @@ public class UserFileController {
                     .headers(headers)
                     .body(response);
         } catch (IOException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
