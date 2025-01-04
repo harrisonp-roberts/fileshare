@@ -7,14 +7,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @SpringBootApplication
 public class FileshareApplication {
-    /*
-    TODO:
-    - watch directory functionality
-    - compression
-    - hash checking on individual chunks and the whole
-     */
     public static void main(String[] args) {
         SpringApplication.run(FileshareApplication.class, args);
     }
-
 }
