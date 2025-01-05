@@ -1,6 +1,7 @@
 package dev.hroberts.fileshare.fileupload.application.repositories;
 
 import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
+import dev.hroberts.fileshare.fileupload.infrastructure.util.hashing.IHashStrategy;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,4 +22,6 @@ public interface IFileSystemRepository {
     void copy(UUID id, String source, String target, boolean append) throws IOException;
 
     Path load(UUID id, String fileName) throws FileNotFoundException;
+
+    String getHash(UUID id, String fileName, IHashStrategy hashStrategy) throws IOException;
 }

@@ -1,6 +1,7 @@
-package dev.hroberts.fileshare.fileupload.infrastructure;
+package dev.hroberts.fileshare.fileupload.infrastructure.repositories;
 
 import dev.hroberts.fileshare.fileupload.application.repositories.IFileSystemRepository;
+import dev.hroberts.fileshare.fileupload.infrastructure.util.hashing.IHashStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -94,6 +95,15 @@ public class LocalFileSystemRepository implements IFileSystemRepository {
             return filePath;
         } else {
             throw new FileNotFoundException();
+        }
+    }
+
+    @Override
+    public String getHash(UUID id, String fileName, IHashStrategy hashStrategy) throws IOException {
+        var filePath = rootFilePath.resolve(id.toString()).resolve(fileName);
+        if(!filePath.toFile().exists()) throw new FileNotFoundException();
+        try(var inputStream = new FileInputStream(filePath.toFile())) {
+            return hashStrategy.generateHash(inputStream);
         }
     }
 }

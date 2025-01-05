@@ -1,5 +1,6 @@
 package dev.hroberts.fileshare.fileupload.controllers;
 
+import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashException;
 import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashAlgorithmException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.UploadAlreadyCompletedException;
@@ -37,7 +38,7 @@ public class UserFileController {
     }
 
     @PostMapping("/upload/{id}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID id, @RequestParam(required = false) String hash, @RequestParam(required = false) String hashAlgorithm, @RequestParam MultipartFile file, @RequestParam int chunkIndex) throws IDomainException, InvalidHashAlgorithmException, UploadAlreadyCompletedException {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID id, @RequestParam(required = false) String hash, @RequestParam(required = false) String hashAlgorithm, @RequestParam MultipartFile file, @RequestParam int chunkIndex) throws IDomainException, InvalidHashAlgorithmException, UploadAlreadyCompletedException, InvalidHashException {
         try {
             userFileService.saveChunk(id, chunkIndex, hash, hashAlgorithm, file.getInputStream());
             return ResponseEntity.ok().build();
@@ -48,7 +49,7 @@ public class UserFileController {
     }
 
     @PutMapping("/complete/{id}")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID id, @RequestBody(required = false) CompleteChunkedUploadDto request) throws InvalidHashAlgorithmException, UploadAlreadyCompletedException {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID id, @RequestBody(required = false) CompleteChunkedUploadDto request) throws InvalidHashAlgorithmException, UploadAlreadyCompletedException, InvalidHashException {
         try {
             String hash = null;
             String hashAlgorithm = null;

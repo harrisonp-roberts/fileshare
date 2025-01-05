@@ -14,10 +14,10 @@ services:
       - /files/dir:/files #Optional
 
   fileshare-redis:
-    image: redis:6.2-alpine
-    container_name: fileshare-redis
+    image: valkey/valkey:8
+    container_name: fileshare-valkey
     restart: unless-stopped
-    command: redis-server --save 20 1 --loglevel warning
+    command: valkey-server --save 20 1 --loglevel warning
     volumes:
       - fileshare-data:/data
     networks:

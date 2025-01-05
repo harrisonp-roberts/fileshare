@@ -1,5 +1,6 @@
 package dev.hroberts.fileshare.fileupload.controllers.exception;
 
+import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashException;
 import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashAlgorithmException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.UploadAlreadyCompletedException;
@@ -9,6 +10,8 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+
+import java.lang.annotation.Repeatable;
 
 @ControllerAdvice
 public class UserExceptionHandlers {
@@ -24,6 +27,11 @@ public class UserExceptionHandlers {
 
     @ExceptionHandler(IDomainException.class)
     public ResponseEntity<ErrorResponse> handleException(IDomainException ex, WebRequest request) {
+        return ResponseEntity.badRequest().body(ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidHashException.class)
+    public ResponseEntity<ErrorResponse> handleException(InvalidHashException ex, WebRequest request) {
         return ResponseEntity.badRequest().body(ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
