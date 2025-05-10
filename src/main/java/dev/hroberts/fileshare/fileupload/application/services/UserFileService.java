@@ -47,9 +47,11 @@ public class UserFileService {
     }
 
     public void saveChunk(UUID id, int chunkIndex, String hash, String hashAlgorithm, InputStream input) throws IDomainException, InvalidHashAlgorithmException, UploadAlreadyCompletedException, InvalidHashException {
-        if((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null)) throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
+        if ((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null))
+            throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
         var chunkedUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
-        if (chunkedUpload.completing) throw new UploadAlreadyCompletedException("Chunks cannot be added to a completed upload");
+        if (chunkedUpload.completing)
+            throw new UploadAlreadyCompletedException("Chunks cannot be added to a completed upload");
 
         var chunkName = String.format("%s.%s", chunkedUpload.name, chunkIndex);
 
@@ -59,16 +61,18 @@ public class UserFileService {
             throw new FailedToSaveChunkException();
         }
 
-        if(hash != null) {
+        if (hash != null) {
             validateFileHash(id, chunkName, hash, hashAlgorithm);
         }
     }
 
     public SharedFileInfo completeUpload(UUID id, String hash, String hashAlgorithm) throws UploadAlreadyCompletedException, InvalidHashAlgorithmException, IOException, InvalidHashException {
-        if((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null)) throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
+        if ((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null))
+            throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
 
         var chunkedFileUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
-        if(chunkedFileUpload.completing) throw new UploadAlreadyCompletedException("Upload has already been completed");
+        if (chunkedFileUpload.completing)
+            throw new UploadAlreadyCompletedException("Upload has already been completed");
         var sharedFileInfo = new SharedFileInfo(id, chunkedFileUpload.name, chunkedFileUpload.downloadLimit, chunkedFileUpload.startTime);
         fileInfoRepository.save(sharedFileInfo);
 
@@ -79,7 +83,24 @@ public class UserFileService {
     public DownloadableFile getDownloadableFile(UUID id) throws FileNotFoundException {
         var fileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
         var filePath = localFileStore.load(id, fileInfo.fileName);
-        fileInfo.download();
+        //todo increment properly with range
+//        fileInfo.download();
+        var shouldDelete = fileInfo.remainingDownloads == 0;
+
+        if (shouldDelete) {
+            fileInfoRepository.delete(fileInfo);
+        } else {
+            fileInfoRepository.save(fileInfo);
+        }
+
+        return new DownloadableFile(fileInfo.fileName, filePath, shouldDelete);
+    }
+
+    public DownloadableFile getDownloadableFile(UUID id, String range) throws FileNotFoundException {
+        var fileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
+        var filePath = localFileStore.load(id, fileInfo.fileName);
+        //todo increment properly with range
+//        fileInfo.download();
         var shouldDelete = fileInfo.remainingDownloads == 0;
 
         if (shouldDelete) {
@@ -107,7 +128,7 @@ public class UserFileService {
 
         try {
             var hash = localFileStore.getHash(id, filename, hashStrategy);
-            if(!hash.equals(expectedHash)) throw new InvalidHashException("Hash check failed");
+            if (!hash.equals(expectedHash)) throw new InvalidHashException("Hash check failed");
         } catch (IOException e) {
             throw new InvalidHashException("Hash check failed");
         }

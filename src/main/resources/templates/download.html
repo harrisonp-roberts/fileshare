@@ -68,12 +68,13 @@
         const btn = document.getElementById("download");
         const downloadUrl = host + "/files/download/" + fileInfo.id;
         console.log(downloadUrl);
-        btn.onclick = () => {
-            let link = document.createElement("a");
-            link.href = downloadUrl;
-            link.download = fileInfo.fileName;
-            link.click();
-            link.remove();
+        btn.onclick = async () => {
+            await fetch(downloadUrl, {
+                method: "GET",
+                headers: {
+                    "Range": "0"
+                }
+            });
         }
     }
     async function refresh() {

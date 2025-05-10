@@ -14,6 +14,7 @@ import dev.hroberts.fileshare.fileupload.controllers.resources.DeletableFileSyst
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -72,7 +73,7 @@ public class UserFileController {
     }
 
     @GetMapping(value = "/download/{id}")
-    public @ResponseBody ResponseEntity<Resource> download(@PathVariable UUID id, HttpServletResponse servletResponse) {
+    public @ResponseBody ResponseEntity<Resource> download(@PathVariable UUID id, @RequestHeader("Range") String range, HttpServletResponse servletResponse) {
         try {
             var downloadableFile = userFileService.getDownloadableFile(id);
             var response = new DeletableFileSystemResource(downloadableFile.filePath, downloadableFile.shouldDelete);
