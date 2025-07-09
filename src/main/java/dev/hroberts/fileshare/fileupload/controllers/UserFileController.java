@@ -14,7 +14,6 @@ import dev.hroberts.fileshare.fileupload.controllers.resources.DeletableFileSyst
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRange;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -79,7 +78,8 @@ public class UserFileController {
             var response = new DeletableFileSystemResource(downloadableFile.filePath, downloadableFile.shouldDelete);
             var headers = new HttpHeaders();
             headers.setContentType(downloadableFile.mediaType);
-            headers.add("Content-Disposition", "attachment; filename=" + downloadableFile.fileName);
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + downloadableFile.fileName);
+            headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
 
             return ResponseEntity.ok().contentLength(response.contentLength())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
