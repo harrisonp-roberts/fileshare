@@ -1,7 +1,7 @@
 package dev.hroberts.fileshare.fileupload.application.services;
 
 import dev.hroberts.fileshare.fileupload.controllers.dtos.UploadFileByPathDto;
-import dev.hroberts.fileshare.fileupload.domain.SharedFileInfo;
+import dev.hroberts.fileshare.fileupload.domain.FileInfo;
 import dev.hroberts.fileshare.fileupload.application.repositories.IFileInfoRepository;
 import dev.hroberts.fileshare.fileupload.application.repositories.IFileSystemRepository;
 import org.springframework.stereotype.Service;
@@ -26,24 +26,24 @@ public class AdminFileService {
     }
 
     @Deprecated
-    public SharedFileInfo uploadByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
+    public FileInfo uploadByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
         var fileName = extractFileName(uploadFileByPathDto.filePath);
-        var sharedFileInfo = new SharedFileInfo(UUID.randomUUID(),fileName, uploadFileByPathDto.downloadLimit, LocalDateTime.now(ZoneId.of("UTC")));
+        var sharedFileInfo = new FileInfo(UUID.randomUUID(),fileName, uploadFileByPathDto.downloadLimit, LocalDateTime.now(ZoneId.of("UTC")));
 
         fileStore.copyFileIn(sharedFileInfo.id, uploadFileByPathDto.filePath, sharedFileInfo.fileName);
         return fileInfoRepository.save(sharedFileInfo);
     }
 
-    public List<SharedFileInfo> listFiles() {
+    public List<FileInfo> listFiles() {
         var fileInfoIterable = fileInfoRepository.findAll();
         return StreamSupport.stream(fileInfoIterable.spliterator(), false).collect(Collectors.toList());
     }
 
     public void purgeFiles() {
         var files = fileInfoRepository.findAll();
-        files.forEach(sharedFileInfo -> {
-            fileStore.deleteFileByName(sharedFileInfo.id, sharedFileInfo.fileName);
-            fileInfoRepository.delete(sharedFileInfo);
+        files.forEach(fileInfo -> {
+            fileStore.deleteFileByName(fileInfo.id, fileInfo.fileName);
+            fileInfoRepository.delete(fileInfo);
         });
     }
 

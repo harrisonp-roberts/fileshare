@@ -11,7 +11,6 @@ import dev.hroberts.fileshare.fileupload.controllers.dtos.mappers.ChunkedFileUpl
 import dev.hroberts.fileshare.fileupload.controllers.dtos.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.fileupload.application.services.UserFileService;
 import dev.hroberts.fileshare.fileupload.controllers.resources.DeletableFileSystemResource;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -72,7 +71,7 @@ public class UserFileController {
     }
 
     @GetMapping(value = "/download/{id}")
-    public @ResponseBody ResponseEntity<Resource> download(@PathVariable UUID id, @RequestHeader("Range") String range, HttpServletResponse servletResponse) {
+    public @ResponseBody ResponseEntity<Resource> download(@PathVariable UUID id) {
         try {
             var downloadableFile = userFileService.getDownloadableFile(id);
             var response = new DeletableFileSystemResource(downloadableFile.filePath, downloadableFile.shouldDelete);

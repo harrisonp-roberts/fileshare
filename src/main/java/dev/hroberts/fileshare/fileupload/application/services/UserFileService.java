@@ -4,7 +4,7 @@ import dev.hroberts.fileshare.fileupload.application.constants.HashStrategyEnum;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashException;
 import dev.hroberts.fileshare.fileupload.domain.ChunkedFileUpload;
 import dev.hroberts.fileshare.fileupload.domain.DownloadableFile;
-import dev.hroberts.fileshare.fileupload.domain.SharedFileInfo;
+import dev.hroberts.fileshare.fileupload.domain.FileInfo;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.UploadAlreadyCompletedException;
 import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
 import dev.hroberts.fileshare.fileupload.domain.domainexceptions.FailedToSaveChunkException;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
+import java.util.AbstractMap;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -66,14 +66,14 @@ public class UserFileService {
         }
     }
 
-    public SharedFileInfo completeUpload(UUID id, String hash, String hashAlgorithm) throws UploadAlreadyCompletedException, InvalidHashAlgorithmException, IOException, InvalidHashException {
+    public FileInfo completeUpload(UUID id, String hash, String hashAlgorithm) throws UploadAlreadyCompletedException, InvalidHashAlgorithmException, IOException, InvalidHashException {
         if ((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null))
             throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
 
         var chunkedFileUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
         if (chunkedFileUpload.completing)
             throw new UploadAlreadyCompletedException("Upload has already been completed");
-        var sharedFileInfo = new SharedFileInfo(id, chunkedFileUpload.name, chunkedFileUpload.downloadLimit, chunkedFileUpload.startTime);
+        var sharedFileInfo = new FileInfo(id, chunkedFileUpload.name, chunkedFileUpload.downloadLimit, chunkedFileUpload.startTime);
         fileInfoRepository.save(sharedFileInfo);
 
         asyncFileService.processChunks(id, chunkedFileUpload, hash, hashAlgorithm);
@@ -83,24 +83,7 @@ public class UserFileService {
     public DownloadableFile getDownloadableFile(UUID id) throws FileNotFoundException {
         var fileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
         var filePath = localFileStore.load(id, fileInfo.fileName);
-        //todo increment properly with range
-//        fileInfo.download();
-        var shouldDelete = fileInfo.remainingDownloads == 0;
-
-        if (shouldDelete) {
-            fileInfoRepository.delete(fileInfo);
-        } else {
-            fileInfoRepository.save(fileInfo);
-        }
-
-        return new DownloadableFile(fileInfo.fileName, filePath, shouldDelete);
-    }
-
-    public DownloadableFile getDownloadableFile(UUID id, String range) throws FileNotFoundException {
-        var fileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
-        var filePath = localFileStore.load(id, fileInfo.fileName);
-        //todo increment properly with range
-//        fileInfo.download();
+        fileInfo.remainingDownloads--;
         var shouldDelete = fileInfo.remainingDownloads == 0;
 
         if (shouldDelete) {
@@ -119,8 +102,25 @@ public class UserFileService {
         return new String(Base64.getEncoder().encode(qrCodeByteStream.toByteArray()));
     }
 
-    public SharedFileInfo getFileInfo(UUID id) {
+    public FileInfo getFileInfo(UUID id) {
         return fileInfoRepository.findById(id.toString()).orElse(null);
+    }
+
+    private AbstractMap.SimpleEntry<Integer, Integer> parseRange(String range) {
+        if (range == null || range.isEmpty()) return null;
+        String[] parts = range.split("=");
+        String[] rangeParts = parts[1].split("-");
+        if (parts.length != 2) return null;
+        if (rangeParts.length < 1 || rangeParts.length > 2) return null;
+
+        try {
+            int start = Integer.parseInt(rangeParts[0]);
+            int end = rangeParts.length == 2 ? Integer.parseInt(rangeParts[1]) : -1;
+            if (start > end) return null;
+            return new AbstractMap.SimpleEntry<>(start, end);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private void validateFileHash(UUID id, String filename, String expectedHash, String hashAlgorithm) throws InvalidHashException {

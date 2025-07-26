@@ -1,22 +1,22 @@
 package dev.hroberts.fileshare.fileupload.controllers.dtos.mappers;
 
 import dev.hroberts.fileshare.fileupload.controllers.dtos.SharedFileInfoDto;
-import dev.hroberts.fileshare.fileupload.domain.SharedFileInfo;
+import dev.hroberts.fileshare.fileupload.domain.FileInfo;
 
 import java.text.DecimalFormat;
 import java.time.ZoneOffset;
 
 public class SharedFileInfoMapper {
-    public static SharedFileInfoDto mapToDto(SharedFileInfo sharedFileInfo) {
+    public static SharedFileInfoDto mapToDto(FileInfo fileInfo) {
         var sharedFileInfoDto = new SharedFileInfoDto();
-        sharedFileInfoDto.id = sharedFileInfo.id;
-        sharedFileInfoDto.fileName = sharedFileInfo.fileName;
-        sharedFileInfoDto.fileSize = prettyPrintFileSize(sharedFileInfo.fileSize);
-        sharedFileInfoDto.remainingDownloads = sharedFileInfo.remainingDownloads;
-        sharedFileInfoDto.downloadLimit = sharedFileInfo.downloadLimit;
-        sharedFileInfoDto.ready = sharedFileInfo.ready;
-        sharedFileInfoDto.uploadStart = sharedFileInfo.uploadStart.toInstant(ZoneOffset.UTC).toEpochMilli();
-        sharedFileInfoDto.uploadEnd = sharedFileInfo.uploadEnd.toInstant(ZoneOffset.UTC).toEpochMilli();
+        sharedFileInfoDto.id = fileInfo.id;
+        sharedFileInfoDto.fileName = fileInfo.fileName;
+        sharedFileInfoDto.fileSize = prettyPrintFileSize(fileInfo.fileSize);
+        sharedFileInfoDto.remainingDownloads = fileInfo.remainingDownloads;
+        sharedFileInfoDto.downloadLimit = fileInfo.downloadLimit;
+        sharedFileInfoDto.ready = fileInfo.ready;
+        sharedFileInfoDto.uploadStart = fileInfo.uploadStart.toInstant(ZoneOffset.UTC).toEpochMilli();
+        sharedFileInfoDto.uploadEnd = fileInfo.uploadEnd.toInstant(ZoneOffset.UTC).toEpochMilli();
         return sharedFileInfoDto;
     }
 
