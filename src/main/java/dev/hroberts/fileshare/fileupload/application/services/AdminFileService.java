@@ -28,7 +28,7 @@ public class AdminFileService {
     @Deprecated
     public FileInfo uploadByPath(UploadFileByPathDto uploadFileByPathDto) throws IOException {
         var fileName = extractFileName(uploadFileByPathDto.filePath);
-        var sharedFileInfo = new FileInfo(UUID.randomUUID(),fileName, uploadFileByPathDto.downloadLimit, LocalDateTime.now(ZoneId.of("UTC")));
+        var sharedFileInfo = new FileInfo(UUID.randomUUID(),fileName, LocalDateTime.now(ZoneId.of("UTC")));
 
         fileStore.copyFileIn(sharedFileInfo.id, uploadFileByPathDto.filePath, sharedFileInfo.fileName);
         return fileInfoRepository.save(sharedFileInfo);

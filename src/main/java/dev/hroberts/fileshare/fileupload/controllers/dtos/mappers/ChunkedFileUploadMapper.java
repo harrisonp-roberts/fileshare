@@ -10,7 +10,6 @@ public class ChunkedFileUploadMapper {
         var chunkedFileUploadDto = new ChunkedFileUploadDto();
         chunkedFileUploadDto.id = chunkedFileUpload.id;
         chunkedFileUploadDto.name = chunkedFileUpload.name;
-        chunkedFileUploadDto.downloadLimit = chunkedFileUpload.downloadLimit;
         chunkedFileUploadDto.startTime = chunkedFileUpload.startTime.toInstant(ZoneOffset.UTC).toEpochMilli();
         return chunkedFileUploadDto;
     }

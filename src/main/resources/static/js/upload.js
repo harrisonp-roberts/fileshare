@@ -19,8 +19,8 @@ class view {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    const chunkSize = (1024 * 1024 * 50);
-    const maxConcurrentUploads = 10; // Maximum number of concurrent chunk uploads
+    const chunkSize = (1024 * 1024) * 10;
+    const maxConcurrentUploads = 1000; // Maximum number of concurrent chunk uploads
     const baseUrl = host + "/files/";
     console.log("Base URL: ", baseUrl);
     const initialState = states.SELECT;
@@ -208,12 +208,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function getParams() {
         let params = {
-            downloadLimit: -1,
             fileName: filesToUpload[0].name
         };
-
-        if(document.getElementById('download-limit').value > 0)
-            params.downloadLimit = document.getElementById('download-limit').value;
 
         return params;
     }
@@ -224,8 +220,7 @@ window.addEventListener('DOMContentLoaded', () => {
         let response = await fetch(baseUrl + 'initiate-multipart', {
             method: 'POST',
             body: JSON.stringify({
-                name: params.fileName,
-                downloadLimit: params.downloadLimit
+                name: params.fileName
             }),
             headers: {
                 'Content-Type': 'application/json'
@@ -259,7 +254,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     const chunkIndex = Math.floor(pos / chunkSize);
                     const formData = buildFormData(slice, chunkIndex, hash);
 
-                    await fetch(baseUrl + 'upload/' + id, {
+                    await fetch(baseUrl + id + '/add-chunk', {
                         method: 'POST',
                         body: formData
                     });
@@ -299,7 +294,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     async function complete(id) {
-        return await fetch(baseUrl + 'complete/' + id, {
+        return await fetch(baseUrl + id + '/complete', {
             method: 'PUT'
         }).then(response => response.json());
     }

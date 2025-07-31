@@ -9,7 +9,7 @@ import dev.hroberts.fileshare.fileupload.controllers.dtos.CompleteChunkedUploadD
 import dev.hroberts.fileshare.fileupload.controllers.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.fileupload.controllers.dtos.mappers.ChunkedFileUploadMapper;
 import dev.hroberts.fileshare.fileupload.controllers.dtos.mappers.SharedFileInfoMapper;
-import dev.hroberts.fileshare.fileupload.application.services.UserFileService;
+import dev.hroberts.fileshare.fileupload.application.services.FileService;
 import dev.hroberts.fileshare.fileupload.controllers.resources.DeletableFileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -23,23 +23,23 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("files")
-public class UserFileController {
-    private final UserFileService userFileService;
+public class FileController {
+    private final FileService fileService;
 
-    public UserFileController(UserFileService userFileService) {
-        this.userFileService = userFileService;
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
     }
 
-    @PostMapping("/initiate-multipart")
+    @PostMapping("initiate-multipart")
     public @ResponseBody ResponseEntity<ChunkedFileUploadDto> initiateMultipartUpload(@RequestBody ChunkedFileUploadDto request) throws IDomainException {
-        var chunkedFileUpload = userFileService.initiateChunkedUpload(request.name, request.downloadLimit);
+        var chunkedFileUpload = fileService.initiateChunkedUpload(request.name);
         return ResponseEntity.ok(ChunkedFileUploadMapper.mapToDto(chunkedFileUpload));
     }
 
-    @PostMapping("/upload/{id}")
+    @PostMapping("{id}/add-chunk")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> uploadChunk(@PathVariable UUID id, @RequestParam(required = false) String hash, @RequestParam(required = false) String hashAlgorithm, @RequestParam MultipartFile file, @RequestParam int chunkIndex) throws IDomainException, InvalidHashAlgorithmException, UploadAlreadyCompletedException, InvalidHashException {
         try {
-            userFileService.saveChunk(id, chunkIndex, hash, hashAlgorithm, file.getInputStream());
+            fileService.saveChunk(id, chunkIndex, hash, hashAlgorithm, file.getInputStream());
             return ResponseEntity.ok().build();
 
         } catch (IOException e) {
@@ -47,7 +47,7 @@ public class UserFileController {
         }
     }
 
-    @PutMapping("/complete/{id}")
+    @PutMapping("{id}/complete")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> completeUpload(@PathVariable UUID id, @RequestBody(required = false) CompleteChunkedUploadDto request) throws InvalidHashAlgorithmException, UploadAlreadyCompletedException, InvalidHashException {
         try {
             String hash = null;
@@ -57,23 +57,23 @@ public class UserFileController {
                 hashAlgorithm = request.hashAlgorithm;
             }
 
-            var response = userFileService.completeUpload(id, hash, hashAlgorithm);
+            var response = fileService.completeUpload(id, hash, hashAlgorithm);
             return ResponseEntity.ok(SharedFileInfoMapper.mapToDto(response));
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
-    @GetMapping("/info/{id}")
+    @GetMapping("{id}/info")
     public @ResponseBody ResponseEntity<SharedFileInfoDto> getInfo(@PathVariable UUID id) {
-        var response = userFileService.getFileInfo(id);
+        var response = fileService.getFileInfo(id);
         return ResponseEntity.ok(SharedFileInfoMapper.mapToDto(response));
     }
 
-    @GetMapping(value = "/download/{id}")
+    @GetMapping(value = "{id}/download")
     public @ResponseBody ResponseEntity<Resource> download(@PathVariable UUID id) {
         try {
-            var downloadableFile = userFileService.getDownloadableFile(id);
+            var downloadableFile = fileService.getDownloadableFile(id);
             var response = new DeletableFileSystemResource(downloadableFile.filePath, downloadableFile.shouldDelete);
             var headers = new HttpHeaders();
             headers.setContentType(downloadableFile.mediaType);

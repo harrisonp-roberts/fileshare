@@ -25,14 +25,14 @@ import java.util.Base64;
 import java.util.UUID;
 
 @Service
-public class UserFileService {
+public class FileService {
     final String host;
     final IFileInfoRepository fileInfoRepository;
     final IChunkedFileUploadRepository chunkedUploadRepository;
     final IFileSystemRepository localFileStore;
     final AsyncFileService asyncFileService;
 
-    public UserFileService(IFileInfoRepository fileInfoRepository, IChunkedFileUploadRepository fileUploadRepository, IFileSystemRepository localFileStore, @Value("${host}") String host, AsyncFileService asyncFileService) {
+    public FileService(IFileInfoRepository fileInfoRepository, IChunkedFileUploadRepository fileUploadRepository, IFileSystemRepository localFileStore, @Value("${host}") String host, AsyncFileService asyncFileService) {
         this.fileInfoRepository = fileInfoRepository;
         this.chunkedUploadRepository = fileUploadRepository;
         this.localFileStore = localFileStore;
@@ -40,8 +40,8 @@ public class UserFileService {
         this.asyncFileService = asyncFileService;
     }
 
-    public ChunkedFileUpload initiateChunkedUpload(String name, int downloadLimit) throws IDomainException {
-        var chunkedFileUpload = new ChunkedFileUpload(name, downloadLimit);
+    public ChunkedFileUpload initiateChunkedUpload(String name) throws IDomainException {
+        var chunkedFileUpload = new ChunkedFileUpload(name);
         chunkedUploadRepository.save(chunkedFileUpload);
         return chunkedFileUpload;
     }
@@ -73,7 +73,7 @@ public class UserFileService {
         var chunkedFileUpload = chunkedUploadRepository.findById(id.toString()).orElseThrow();
         if (chunkedFileUpload.completing)
             throw new UploadAlreadyCompletedException("Upload has already been completed");
-        var sharedFileInfo = new FileInfo(id, chunkedFileUpload.name, chunkedFileUpload.downloadLimit, chunkedFileUpload.startTime);
+        var sharedFileInfo = new FileInfo(id, chunkedFileUpload.name, chunkedFileUpload.startTime);
         fileInfoRepository.save(sharedFileInfo);
 
         asyncFileService.processChunks(id, chunkedFileUpload, hash, hashAlgorithm);
@@ -83,16 +83,7 @@ public class UserFileService {
     public DownloadableFile getDownloadableFile(UUID id) throws FileNotFoundException {
         var fileInfo = fileInfoRepository.findById(id.toString()).orElseThrow();
         var filePath = localFileStore.load(id, fileInfo.fileName);
-        fileInfo.remainingDownloads--;
-        var shouldDelete = fileInfo.remainingDownloads == 0;
-
-        if (shouldDelete) {
-            fileInfoRepository.delete(fileInfo);
-        } else {
-            fileInfoRepository.save(fileInfo);
-        }
-
-        return new DownloadableFile(fileInfo.fileName, filePath, shouldDelete);
+        return new DownloadableFile(fileInfo.fileName, filePath);
     }
 
     public String generateQrCode(UUID id) {

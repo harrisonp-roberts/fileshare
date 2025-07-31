@@ -12,8 +12,6 @@ public class SharedFileInfoMapper {
         sharedFileInfoDto.id = fileInfo.id;
         sharedFileInfoDto.fileName = fileInfo.fileName;
         sharedFileInfoDto.fileSize = prettyPrintFileSize(fileInfo.fileSize);
-        sharedFileInfoDto.remainingDownloads = fileInfo.remainingDownloads;
-        sharedFileInfoDto.downloadLimit = fileInfo.downloadLimit;
         sharedFileInfoDto.ready = fileInfo.ready;
         sharedFileInfoDto.uploadStart = fileInfo.uploadStart.toInstant(ZoneOffset.UTC).toEpochMilli();
         sharedFileInfoDto.uploadEnd = fileInfo.uploadEnd.toInstant(ZoneOffset.UTC).toEpochMilli();

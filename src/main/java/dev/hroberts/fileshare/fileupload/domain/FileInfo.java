@@ -13,9 +13,6 @@ public class FileInfo {
 
     @Id
     public UUID id;
-    public int downloadLimit;
-    public int remainingDownloads;
-    public long bytesDownloaded;
     public long fileSize;
     public boolean ready;
     public LocalDateTime uploadStart;
@@ -25,22 +22,11 @@ public class FileInfo {
         id = UUID.randomUUID();
     }
 
-    public FileInfo(UUID id, String fileName, int downloadLimit, LocalDateTime uploadStart) {
+    public FileInfo(UUID id, String fileName, LocalDateTime uploadStart) {
         this.id = id;
         this.fileName = fileName;
-        this.downloadLimit = downloadLimit;
         this.uploadStart = uploadStart;
         this.uploadEnd = LocalDateTime.now(ZoneId.of("UTC"));
-        remainingDownloads = downloadLimit;
-        bytesDownloaded = 0;
         ready = false;
-    }
-
-    public void download(long downloadSize) {
-        bytesDownloaded += downloadSize;
-        if(bytesDownloaded >= fileSize) {
-            remainingDownloads--;
-            bytesDownloaded = fileSize;
-        }
     }
 }

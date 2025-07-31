@@ -13,20 +13,14 @@ public class ChunkedFileUpload {
     @Id
     public UUID id;
     public String name;
-    public int downloadLimit;
     public boolean completing = false;
     public LocalDateTime startTime;
 
-    public ChunkedFileUpload(String name, int downloadLimit) throws IDomainException {
+    public ChunkedFileUpload(String name) throws IDomainException {
         if(name == null || name.isEmpty()) throw new InvalidFileNameException();
         id = UUID.randomUUID();
         this.name = name;
 
         startTime = LocalDateTime.now(ZoneId.of("UTC"));
-        if(downloadLimit < 1) {
-            this.downloadLimit = -1;
-        } else {
-            this.downloadLimit = downloadLimit;
-        }
     }
 }

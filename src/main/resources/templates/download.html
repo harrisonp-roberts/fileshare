@@ -29,26 +29,19 @@
                         <p><span th:text="${fileInfo.fileName}"></span> is still processing. Check back later.</p>
                     </div>
                     <div class="row h-100" th:if="${fileInfo != null && fileInfo.ready}">
-                        <div class="col-md-12" th:if="${fileInfo.remainingDownloads != 0}">
+                        <div class="col-md-12">
                             <h3 class="card-title">Download file</h3>
                             <ul class="list-group">
                                 <li class="list-group-item">File Name: &nbsp;<span
                                         th:text="${fileInfo.fileName}"></span></li>
                                 <li class="list-group-item">File Size: &nbsp;<span
                                         th:text="${fileInfo.fileSize}"></span></li>
-                                <li th:if="${fileInfo.downloadLimit > 1}" class="list-group-item">Download Limit:&nbsp;<span
-                                        th:text="${fileInfo.downloadLimit}"></span></li>
-                                <li th:if="${fileInfo.remainingDownloads > 1}" class="list-group-item">Remaining Downloads:&nbsp;<span th:text="${fileInfo.remainingDownloads}"></span></li>
                                 <li class="list-group-item">
                                     <div class="row">
                                         <button class="btn btn-secondary" id="download">Download now</button>
                                     </div>
                                 </li>
                             </ul>
-                        </div>
-                        <div class="col-md-12" th:if="${fileInfo.remainingDownloads == 0}">
-                            <h3 class="card-title">Download expired</h3>
-                            <p>The requested file has exceeded it's allowed number of downloads</p>
                         </div>
                     </div>
                 </div>
@@ -66,7 +59,7 @@
         refresh();
     } else {
         const btn = document.getElementById("download");
-        const downloadUrl = host + "/files/download/" + fileInfo.id;
+        const downloadUrl = host + "/files/" + fileInfo.id + "/download";
         console.log(downloadUrl);
         btn.onclick = async () => {
             const response = await fetch(downloadUrl, {
