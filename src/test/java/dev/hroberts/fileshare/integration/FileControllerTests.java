@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-public class TestFileController extends DatabaseBackedTest {
+public class FileControllerTests extends DatabaseBackedTest {
 
     @Test
     public void initiateUploadWithValidFileShouldSucceed() throws Exception {
@@ -174,5 +174,54 @@ public class TestFileController extends DatabaseBackedTest {
         // assert
         var status = response.getResponse().getStatus();
         assertTrue(status >= 400 && status < 500);
+    }
+
+    @Test
+    public void testOneShotUpload() throws Exception {
+        // arrange
+        var contents = "test";
+        var file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, contents.getBytes());
+        var namePart = new MockPart("name", "test.txt".getBytes());
+        var hashAlgorithmPart = new MockPart("hashAlgorithm", "MD5".getBytes());
+        var hash = new MockPart("hash", "098f6bcd4621d373cade4e832627b4f6".getBytes());
+        var parts = new ArrayList<MockPart>();
+        parts.add(namePart);
+        parts.add(hashAlgorithmPart);
+        parts.add(hash);
+
+        // act
+        var response = httpPostMultipart("/files/upload", file, parts);
+
+        // assert
+        var fileInfo = validateAndParseResponse(response, SharedFileInfoDto.class);
+        assertNotNull(fileInfo);
+        assertNotNull(fileInfo.id);
+        assertEquals("test.txt", fileInfo.fileName);
+        assertTrue(fileInfo.uploadStart > 0);
+        assertTrue(fileInfo.uploadEnd > 0);
+        assertTrue(fileInfo.uploadEnd > fileInfo.uploadStart);
+    }
+
+    @Test
+    public void downloadOneShotUpload() throws Exception {
+        // arrange
+        var contents = "test";
+        var file = new MockMultipartFile("file", "test.txt", MediaType.TEXT_PLAIN_VALUE, contents.getBytes());
+        var namePart = new MockPart("name", "test.txt".getBytes());
+        var hashAlgorithmPart = new MockPart("hashAlgorithm", "MD5".getBytes());
+        var hash = new MockPart("hash", "098f6bcd4621d373cade4e832627b4f6".getBytes());
+        var parts = new ArrayList<MockPart>();
+        parts.add(namePart);
+        parts.add(hashAlgorithmPart);
+        parts.add(hash);
+        var fileInfoResponse = httpPostMultipart("/files/upload", file, parts);
+        var fileInfo = validateAndParseResponse(fileInfoResponse, SharedFileInfoDto.class);
+
+        // act
+        var response = httpGet("/files/" + fileInfo.id + "/download");
+
+        // assert
+        validateResponse(response);
+        assertEquals(contents, response.getResponse().getContentAsString());
     }
 }

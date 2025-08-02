@@ -29,4 +29,12 @@ public class FileInfo {
         this.uploadEnd = LocalDateTime.now(ZoneId.of("UTC"));
         ready = false;
     }
+
+    public FileInfo(String fileName, LocalDateTime uploadStart) {
+        this.id = UUID.randomUUID();
+        this.fileName = fileName;
+        this.uploadStart = uploadStart;
+        this.uploadEnd = LocalDateTime.now(ZoneId.of("UTC"));
+        ready = false;
+    }
 }

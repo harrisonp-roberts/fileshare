@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Base64;
 import java.util.UUID;
@@ -122,6 +123,24 @@ public class FileService {
             if (!hash.equals(expectedHash)) throw new InvalidHashException("Hash check failed");
         } catch (IOException e) {
             throw new InvalidHashException("Hash check failed");
+        }
+    }
+
+    public FileInfo uploadFile(String name, String hash, String hashAlgorithm, InputStream inputStream) throws InvalidHashAlgorithmException, InvalidHashException {
+        if ((hash == null && hashAlgorithm != null) || (hash != null && hashAlgorithm == null))
+            throw new InvalidHashAlgorithmException("Both the hash and hash algorithm must be either provided or null");
+        try {
+            var fileInfo = new FileInfo(name, LocalDateTime.now());
+            localFileStore.write(fileInfo.id, name, inputStream);
+
+            if (hash != null) {
+                validateFileHash(fileInfo.id, name, hash, hashAlgorithm);
+            }
+
+            fileInfoRepository.save(fileInfo);
+            return fileInfo;
+        } catch (IOException | IDomainException e) {
+            return null;
         }
     }
 }

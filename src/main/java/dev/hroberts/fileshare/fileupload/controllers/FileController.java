@@ -30,6 +30,12 @@ public class FileController {
         this.fileService = fileService;
     }
 
+    @PostMapping("upload")
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> initiateUpload(@RequestParam(required = true) String name, @RequestParam(required = false) String hash, @RequestParam(required = false) String hashAlgorithm, @RequestParam MultipartFile file) throws IDomainException, IOException, InvalidHashAlgorithmException, InvalidHashException {
+        var fileInfo = fileService.uploadFile(name, hash, hashAlgorithm, file.getInputStream());
+        return ResponseEntity.ok(SharedFileInfoMapper.mapToDto(fileInfo));
+    }
+
     @PostMapping("initiate-multipart")
     public @ResponseBody ResponseEntity<ChunkedFileUploadDto> initiateMultipartUpload(@RequestBody ChunkedFileUploadDto request) throws IDomainException {
         var chunkedFileUpload = fileService.initiateChunkedUpload(request.name);
