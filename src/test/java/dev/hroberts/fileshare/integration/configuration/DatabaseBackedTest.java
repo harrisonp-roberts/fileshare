@@ -17,6 +17,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.http.HttpClient;
+import java.util.List;
 
 import static org.junit.Assert.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,6 +53,13 @@ public abstract class DatabaseBackedTest {
     public MvcResult httpPostMultipart(String url, MockMultipartFile file) throws Exception {
         var response = mockMvc.perform(MockMvcRequestBuilders.multipart(url).part(new MockPart("chunkIndex", "0".getBytes())).file(file));
         return response.andReturn();
+    }
+
+    public MvcResult httpPostMultipart(String url, MockMultipartFile file, List<MockPart> parts) throws Exception {
+        var request = MockMvcRequestBuilders.multipart(url);
+        for (var part : parts) {request = request.part(part);}
+        if(file != null) {request = request.file(file);}
+        return mockMvc.perform(request).andReturn();
     }
 
     public MvcResult httpPut(String url) throws Exception {

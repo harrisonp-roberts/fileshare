@@ -4,7 +4,7 @@ services:
     image: fileshare
     restart: unless-stopped
     environment:
-      - HOST=localhost
+      - HOST=10.0.0.94
       - REDIS_SERVER=fileshare-redis
     ports:
       - '8888:8080'
