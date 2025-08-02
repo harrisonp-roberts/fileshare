@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redis.testcontainers.RedisContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
@@ -23,6 +24,7 @@ import static org.junit.Assert.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+@SpringBootTest(properties = { "redis.password=" })
 @AutoConfigureMockMvc
 public abstract class DatabaseBackedTest {
     @Autowired protected MockMvc mockMvc;
@@ -73,8 +75,10 @@ public abstract class DatabaseBackedTest {
     }
 
     static {
-        REDIS_CONTAINER = new RedisContainer(DockerImageName.parse("redis:latest"));
+        REDIS_CONTAINER = new RedisContainer(DockerImageName.parse("redis:latest")).withExposedPorts(6379);
         REDIS_CONTAINER.start();
+        System.setProperty("spring.redis.host", REDIS_CONTAINER.getHost());
+        System.setProperty("spring.redis.port", REDIS_CONTAINER.getMappedPort(6379).toString());
         HTTP_CLIENT = HttpClient.newBuilder().build();
     }
 }

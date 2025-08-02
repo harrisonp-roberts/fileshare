@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("redis")
 public class RedisProperties {
-    private String server;
+    private String host;
     private String port;
     private String password;
 
@@ -26,11 +26,11 @@ public class RedisProperties {
         this.port = port;
     }
 
-    public String getServer() {
-        return server;
+    public String getHost() {
+        return host;
     }
 
-    public void setServer(String server) {
-        this.server = server;
+    public void setHost(String host) {
+        this.host = host;
     }
 }

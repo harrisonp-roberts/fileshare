@@ -1,6 +1,6 @@
 package dev.hroberts.fileshare.shared.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -10,18 +10,15 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @Configuration
 @EnableRedisRepositories
 public class RedisConfiguration {
-    private final String REDIS_HOST;
-    private final int REDIS_PORT;
+    @Value("${spring.redis.host:localhost}")
+    private String redisHost;
 
-    @Autowired
-    public RedisConfiguration(RedisProperties props) {
-        REDIS_HOST = props.getServer();
-        REDIS_PORT = Integer.parseInt(props.getPort());
-    }
+    @Value("${spring.redis.port:6379}")
+    private int redisPort;
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory(REDIS_HOST, REDIS_PORT);
+        return new LettuceConnectionFactory(redisHost, redisPort);
     }
 
     @Bean

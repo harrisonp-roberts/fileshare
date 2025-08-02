@@ -4,7 +4,6 @@ import dev.hroberts.fileshare.fileupload.controllers.dtos.ChunkedFileUploadDto;
 import dev.hroberts.fileshare.fileupload.controllers.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.integration.configuration.DatabaseBackedTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockPart;
@@ -15,10 +14,8 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 @ExtendWith(SpringExtension.class)
 public class TestFileController extends DatabaseBackedTest {
-
 
     @Test
     public void initiateUploadWithValidFileShouldSucceed() throws Exception {
