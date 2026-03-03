@@ -8,7 +8,8 @@ var MD5 = function(d){var r = M(V(Y(X(d),8*d.length)));return r.toLowerCase()};f
 const states = {
     SELECT: "select",
     READY: "ready",
-    UPLOAD: "upload"
+    UPLOAD: "upload",
+    COMPLETE: "complete"
 }
 
 class view {

@@ -1,16 +1,16 @@
-package dev.hroberts.fileshare.fileupload.controllers;
+package dev.hroberts.fileshare.fileupload.presentation.controllers;
 
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashException;
-import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
+import dev.hroberts.fileshare.fileupload.domain.exceptions.IDomainException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashAlgorithmException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.UploadAlreadyCompletedException;
-import dev.hroberts.fileshare.fileupload.controllers.dtos.ChunkedFileUploadDto;
-import dev.hroberts.fileshare.fileupload.controllers.dtos.CompleteChunkedUploadDto;
-import dev.hroberts.fileshare.fileupload.controllers.dtos.SharedFileInfoDto;
-import dev.hroberts.fileshare.fileupload.controllers.dtos.mappers.ChunkedFileUploadMapper;
-import dev.hroberts.fileshare.fileupload.controllers.dtos.mappers.SharedFileInfoMapper;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.ChunkedFileUploadDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.CompleteChunkedUploadDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.SharedFileInfoDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.mappers.ChunkedFileUploadMapper;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.fileupload.application.services.FileService;
-import dev.hroberts.fileshare.fileupload.controllers.resources.DeletableFileSystemResource;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.resources.DeletableFileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -31,7 +31,7 @@ public class FileController {
     }
 
     @PostMapping("upload")
-    public @ResponseBody ResponseEntity<SharedFileInfoDto> initiateUpload(@RequestParam(required = true) String name, @RequestParam(required = false) String hash, @RequestParam(required = false) String hashAlgorithm, @RequestParam MultipartFile file) throws IDomainException, IOException, InvalidHashAlgorithmException, InvalidHashException {
+    public @ResponseBody ResponseEntity<SharedFileInfoDto> initiateUpload(@RequestParam String name, @RequestParam(required = false) String hash, @RequestParam(required = false) String hashAlgorithm, @RequestParam MultipartFile file) throws IDomainException, IOException, InvalidHashAlgorithmException, InvalidHashException {
         var fileInfo = fileService.uploadFile(name, hash, hashAlgorithm, file.getInputStream());
         return ResponseEntity.ok(SharedFileInfoMapper.mapToDto(fileInfo));
     }
@@ -47,7 +47,6 @@ public class FileController {
         try {
             fileService.saveChunk(id, chunkIndex, hash, hashAlgorithm, file.getInputStream());
             return ResponseEntity.ok().build();
-
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }

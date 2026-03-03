@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.shared.config;
+package dev.hroberts.fileshare.fileupload.infrastructure.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

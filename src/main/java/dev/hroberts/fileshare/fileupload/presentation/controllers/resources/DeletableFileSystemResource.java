@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.fileupload.controllers.resources;
+package dev.hroberts.fileshare.fileupload.presentation.controllers.resources;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.FileSystemResource;

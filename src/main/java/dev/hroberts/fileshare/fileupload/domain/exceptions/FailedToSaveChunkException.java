@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.fileupload.domain.domainexceptions;
+package dev.hroberts.fileshare.fileupload.domain.exceptions;
 
 public class FailedToSaveChunkException extends IDomainException {
     public FailedToSaveChunkException() {

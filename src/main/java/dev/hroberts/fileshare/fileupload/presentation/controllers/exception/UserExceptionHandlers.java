@@ -1,7 +1,7 @@
-package dev.hroberts.fileshare.fileupload.controllers.exception;
+package dev.hroberts.fileshare.fileupload.presentation.controllers.exception;
 
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashException;
-import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
+import dev.hroberts.fileshare.fileupload.domain.exceptions.IDomainException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashAlgorithmException;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.UploadAlreadyCompletedException;
 import org.springframework.http.HttpStatus;
@@ -10,8 +10,6 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-
-import java.lang.annotation.Repeatable;
 
 @ControllerAdvice
 public class UserExceptionHandlers {

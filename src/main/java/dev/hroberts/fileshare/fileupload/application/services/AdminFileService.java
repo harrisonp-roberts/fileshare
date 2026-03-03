@@ -1,9 +1,9 @@
 package dev.hroberts.fileshare.fileupload.application.services;
 
-import dev.hroberts.fileshare.fileupload.controllers.dtos.UploadFileByPathDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.UploadFileByPathDto;
 import dev.hroberts.fileshare.fileupload.domain.FileInfo;
 import dev.hroberts.fileshare.fileupload.application.repositories.IFileInfoRepository;
-import dev.hroberts.fileshare.fileupload.application.repositories.IFileSystemRepository;
+import dev.hroberts.fileshare.fileupload.application.repositories.IFIleRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,9 +18,9 @@ import java.util.stream.StreamSupport;
 @Service
 public class AdminFileService {
     final IFileInfoRepository fileInfoRepository;
-    final IFileSystemRepository fileStore;
+    final IFIleRepository fileStore;
 
-    public AdminFileService(IFileInfoRepository repository, IFileSystemRepository fileStore) {
+    public AdminFileService(IFileInfoRepository repository, IFIleRepository fileStore) {
         this.fileInfoRepository = repository;
         this.fileStore = fileStore;
     }

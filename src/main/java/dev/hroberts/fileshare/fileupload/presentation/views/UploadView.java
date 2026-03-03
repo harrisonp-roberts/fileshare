@@ -1,6 +1,6 @@
-package dev.hroberts.fileshare.fileupload.views;
+package dev.hroberts.fileshare.fileupload.presentation.views;
 
-import dev.hroberts.fileshare.fileupload.controllers.dtos.mappers.SharedFileInfoMapper;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.mappers.SharedFileInfoMapper;
 import dev.hroberts.fileshare.fileupload.application.services.FileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;

@@ -1,6 +1,6 @@
 package dev.hroberts.fileshare.fileupload.infrastructure.repositories;
 
-import dev.hroberts.fileshare.fileupload.application.repositories.IFileSystemRepository;
+import dev.hroberts.fileshare.fileupload.application.repositories.IFIleRepository;
 import dev.hroberts.fileshare.fileupload.infrastructure.util.hashing.IHashStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,11 +10,11 @@ import java.nio.file.*;
 import java.util.*;
 
 @Component
-public class LocalFileSystemRepository implements IFileSystemRepository {
+public class LocalFileRepository implements IFIleRepository {
 
     private final Path rootFilePath;
 
-    public LocalFileSystemRepository(@Value("${file.store.dir}") String fileStoreDir) {
+    public LocalFileRepository(@Value("${file.store.dir}") String fileStoreDir) {
         this.rootFilePath = Path.of(fileStoreDir);
     }
 

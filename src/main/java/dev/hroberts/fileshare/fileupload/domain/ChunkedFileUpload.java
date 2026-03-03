@@ -1,6 +1,6 @@
 package dev.hroberts.fileshare.fileupload.domain;
 
-import dev.hroberts.fileshare.fileupload.domain.domainexceptions.*;
+import dev.hroberts.fileshare.fileupload.domain.exceptions.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 

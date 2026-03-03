@@ -1,6 +1,6 @@
-package dev.hroberts.fileshare.fileupload.controllers.dtos.mappers;
+package dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.mappers;
 
-import dev.hroberts.fileshare.fileupload.controllers.dtos.SharedFileInfoDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.fileupload.domain.FileInfo;
 
 import java.text.DecimalFormat;

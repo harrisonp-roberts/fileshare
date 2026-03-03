@@ -1,7 +1,7 @@
 package dev.hroberts.fileshare.integration;
 
-import dev.hroberts.fileshare.fileupload.controllers.dtos.ChunkedFileUploadDto;
-import dev.hroberts.fileshare.fileupload.controllers.dtos.SharedFileInfoDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.ChunkedFileUploadDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.SharedFileInfoDto;
 import dev.hroberts.fileshare.integration.configuration.DatabaseBackedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;

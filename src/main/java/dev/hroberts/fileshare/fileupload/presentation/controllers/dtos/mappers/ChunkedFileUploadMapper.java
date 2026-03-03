@@ -1,6 +1,6 @@
-package dev.hroberts.fileshare.fileupload.controllers.dtos.mappers;
+package dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.mappers;
 
-import dev.hroberts.fileshare.fileupload.controllers.dtos.ChunkedFileUploadDto;
+import dev.hroberts.fileshare.fileupload.presentation.controllers.dtos.ChunkedFileUploadDto;
 import dev.hroberts.fileshare.fileupload.domain.ChunkedFileUpload;
 
 import java.time.ZoneOffset;

@@ -6,9 +6,9 @@ import dev.hroberts.fileshare.fileupload.domain.ChunkedFileUpload;
 import dev.hroberts.fileshare.fileupload.domain.DownloadableFile;
 import dev.hroberts.fileshare.fileupload.domain.FileInfo;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.UploadAlreadyCompletedException;
-import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
-import dev.hroberts.fileshare.fileupload.domain.domainexceptions.FailedToSaveChunkException;
-import dev.hroberts.fileshare.fileupload.application.repositories.IFileSystemRepository;
+import dev.hroberts.fileshare.fileupload.domain.exceptions.IDomainException;
+import dev.hroberts.fileshare.fileupload.domain.exceptions.FailedToSaveChunkException;
+import dev.hroberts.fileshare.fileupload.application.repositories.IFIleRepository;
 import dev.hroberts.fileshare.fileupload.application.repositories.IChunkedFileUploadRepository;
 import dev.hroberts.fileshare.fileupload.application.repositories.IFileInfoRepository;
 import dev.hroberts.fileshare.fileupload.application.services.exceptions.InvalidHashAlgorithmException;
@@ -30,10 +30,10 @@ public class FileService {
     final String host;
     final IFileInfoRepository fileInfoRepository;
     final IChunkedFileUploadRepository chunkedUploadRepository;
-    final IFileSystemRepository localFileStore;
+    final IFIleRepository localFileStore;
     final AsyncFileService asyncFileService;
 
-    public FileService(IFileInfoRepository fileInfoRepository, IChunkedFileUploadRepository fileUploadRepository, IFileSystemRepository localFileStore, @Value("${host}") String host, AsyncFileService asyncFileService) {
+    public FileService(IFileInfoRepository fileInfoRepository, IChunkedFileUploadRepository fileUploadRepository, IFIleRepository localFileStore, @Value("${host}") String host, AsyncFileService asyncFileService) {
         this.fileInfoRepository = fileInfoRepository;
         this.chunkedUploadRepository = fileUploadRepository;
         this.localFileStore = localFileStore;

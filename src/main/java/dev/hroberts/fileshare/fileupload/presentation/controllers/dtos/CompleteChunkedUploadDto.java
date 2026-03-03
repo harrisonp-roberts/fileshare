@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.fileupload.controllers.dtos;
+package dev.hroberts.fileshare.fileupload.presentation.controllers.dtos;
 
 public class CompleteChunkedUploadDto {
     public String hash;

@@ -5,8 +5,7 @@ import dev.hroberts.fileshare.fileupload.application.services.exceptions.Invalid
 import dev.hroberts.fileshare.fileupload.domain.ChunkedFileUpload;
 import dev.hroberts.fileshare.fileupload.application.repositories.IChunkedFileUploadRepository;
 import dev.hroberts.fileshare.fileupload.application.repositories.IFileInfoRepository;
-import dev.hroberts.fileshare.fileupload.application.repositories.IFileSystemRepository;
-import dev.hroberts.fileshare.fileupload.infrastructure.util.hashing.IHashStrategy;
+import dev.hroberts.fileshare.fileupload.application.repositories.IFIleRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +14,11 @@ import java.util.UUID;
 
 @Service
 public class AsyncFileService {
-    final IFileSystemRepository localFileStore;
+    final IFIleRepository localFileStore;
     final IFileInfoRepository fileInfoRepository;
     final IChunkedFileUploadRepository chunkedUploadRepository;
 
-    public AsyncFileService(IFileSystemRepository localFileStore, IFileInfoRepository fileInfoRepository, IChunkedFileUploadRepository chunkedUploadRepository) {
+    public AsyncFileService(IFIleRepository localFileStore, IFileInfoRepository fileInfoRepository, IChunkedFileUploadRepository chunkedUploadRepository) {
         this.localFileStore = localFileStore;
         this.fileInfoRepository = fileInfoRepository;
         this.chunkedUploadRepository = chunkedUploadRepository;

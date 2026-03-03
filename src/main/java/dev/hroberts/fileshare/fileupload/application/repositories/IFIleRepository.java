@@ -1,6 +1,6 @@
 package dev.hroberts.fileshare.fileupload.application.repositories;
 
-import dev.hroberts.fileshare.fileupload.domain.domainexceptions.IDomainException;
+import dev.hroberts.fileshare.fileupload.domain.exceptions.IDomainException;
 import dev.hroberts.fileshare.fileupload.infrastructure.util.hashing.IHashStrategy;
 
 import java.io.FileNotFoundException;
@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
-public interface IFileSystemRepository {
+public interface IFIleRepository {
     long write(UUID id, String name, InputStream input) throws IOException, IDomainException;
 
     List<Path> listFiles(UUID id);

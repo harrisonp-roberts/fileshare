@@ -1,4 +1,4 @@
-package dev.hroberts.fileshare.fileupload.controllers;
+package dev.hroberts.fileshare.fileupload.presentation.controllers;
 
 import org.springframework.web.bind.annotation.*;
 
